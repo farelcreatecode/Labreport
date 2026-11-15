@@ -12,6 +12,7 @@ Route::prefix('public')->group(function () {
     Route::get('/form-data', [PublicReportController::class, 'getFormData']);
     Route::post('/reports', [PublicReportController::class, 'store']);
     Route::get('/reports/{kode}', [PublicReportController::class, 'showPublic']);
+    Route::get('/recent-results', [PublicReportController::class, 'recentResults']);
 });
 
 // ========================================================

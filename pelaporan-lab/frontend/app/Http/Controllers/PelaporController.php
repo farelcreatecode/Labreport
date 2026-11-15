@@ -65,7 +65,8 @@ class PelaporController extends Controller
     }
 
     /**
-     * Halaman Lacak Laporan Publik Berdasarkan Kode Laporan
+     * Halaman Lacak & Hasil Laporan Publik
+     * Menampilkan pencarian tiket sekaligus daftar hasil laporan terkini yang transparan dengan privasi terjaga.
      */
     public function track(Request $request): View
     {
@@ -77,10 +78,14 @@ class PelaporController extends Controller
             if ($response->successful()) {
                 $report = $response->json('data');
             } else {
-                session()->flash('error', "Laporan dengan nomor '{$kode}' tidak ditemukan.");
+                session()->flash('error', "Laporan dengan nomor registrasi '{$kode}' tidak ditemukan. Mohon periksa kembali kode tiket Anda.");
             }
         }
 
-        return view('pelapor.complaints.track', compact('report', 'kode'));
+        // Ambil daftar hasil laporan publik terkini
+        $recentResponse = $this->gateway->get('/public/recent-results');
+        $recentReports = $recentResponse->json('data') ?? [];
+
+        return view('pelapor.complaints.track', compact('report', 'kode', 'recentReports'));
     }
 }

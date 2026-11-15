@@ -73,20 +73,13 @@
                 </div>
             </a>
 
-            <!-- Nav Actions -->
+            <!-- Nav Actions: Menu untuk melihat hasil laporan (Tombol login admin dihapus) -->
             <div class="flex items-center gap-2.5 sm:gap-3">
-                <a href="{{ route('pelapor.track') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/60 rounded-xl transition">
-                    <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                <a href="{{ route('pelapor.track') }}" class="inline-flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-md shadow-indigo-600/20 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
-                    <span>Lacak Status Tiket</span>
-                </a>
-
-                <a href="{{ route('login') }}" class="inline-flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-bold bg-slate-900 hover:bg-slate-800 text-white rounded-xl shadow-md shadow-slate-900/10 transition">
-                    <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
-                    </svg>
-                    <span>Login Admin</span>
+                    <span>Lihat Hasil Laporan</span>
                 </a>
             </div>
         </div>
@@ -100,28 +93,67 @@
             <div class="text-center space-y-3">
                 <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-beacon"></span>
-                    <span>Layanan Pengaduan Aktif 24/7 &bull; Tanpa Perlu Login</span>
+                    <span>Layanan Pengaduan Fasilitas Aktif &bull; Tanpa Perlu Login</span>
                 </div>
                 <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
                     Laporkan Kerusakan Fasilitas Lab
                 </h2>
                 <p class="text-sm sm:text-base text-slate-500 max-w-xl mx-auto leading-relaxed">
-                    Sampaikan kendala komputer, jaringan, atau software laboratorium komputer. Laporan Anda langsung diteruskan kepada teknisi bertugas.
+                    Sampaikan kendala komputer, jaringan, atau software laboratorium komputer. Laporan Anda langsung diteruskan kepada tim teknisi siaga.
                 </p>
 
-                <!-- Quick Highlights -->
-                <div class="grid grid-cols-3 gap-3 pt-2 max-w-lg mx-auto">
-                    <div class="bg-white p-3 rounded-xl border border-slate-200/80 shadow-xs text-center">
-                        <div class="text-xs font-bold text-slate-400 uppercase">Ruang Lab</div>
-                        <div class="text-base font-extrabold text-slate-900 mt-0.5">3 Laboratorium</div>
+                <!-- 3 Card Panduan Kategori Kerusakan (Statistik Coret) -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-3 text-left">
+                    <!-- Card 1: Tentang Software -->
+                    <div class="bg-white p-4 rounded-2xl border border-purple-200/80 shadow-xs hover:shadow-md transition-all border-t-4 border-t-purple-600">
+                        <div class="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center mb-2.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-xs font-black uppercase tracking-wider text-purple-700">1. Tentang Software</h4>
+                        <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                            Aplikasi mata kuliah crash, lisensi software habis, sistem operasi (OS) bermasalah, atau terkena virus.
+                        </p>
                     </div>
-                    <div class="bg-white p-3 rounded-xl border border-slate-200/80 shadow-xs text-center">
-                        <div class="text-xs font-bold text-slate-400 uppercase">Petugas</div>
-                        <div class="text-base font-extrabold text-indigo-600 mt-0.5">Teknisi Siaga</div>
+
+                    <!-- Card 2: Tentang Hardware -->
+                    <div class="bg-white p-4 rounded-2xl border border-blue-200/80 shadow-xs hover:shadow-md transition-all border-t-4 border-t-blue-600">
+                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-2.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-xs font-black uppercase tracking-wider text-blue-700">2. Tentang Hardware</h4>
+                        <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                            Unit PC mati total, monitor bergaris/blank, mouse atau keyboard tidak terdeteksi, power supply bermasalah.
+                        </p>
                     </div>
-                    <div class="bg-white p-3 rounded-xl border border-slate-200/80 shadow-xs text-center">
-                        <div class="text-xs font-bold text-slate-400 uppercase">Kode Tiket</div>
-                        <div class="text-base font-extrabold text-emerald-600 mt-0.5">Otomatis</div>
+
+                    <!-- Card 3: Tentang Jaringan -->
+                    <div class="bg-white p-4 rounded-2xl border border-emerald-200/80 shadow-xs hover:shadow-md transition-all border-t-4 border-t-emerald-600">
+                        <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-2.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-xs font-black uppercase tracking-wider text-emerald-700">3. Tentang Jaringan</h4>
+                        <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                            Koneksi LAN putus, kabel lepas/rusak, akses internet lambat, IP conflict, atau kendala switch/router lab.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Jaminan Kerahasiaan Pelapor (Revisi Dosen: Utamakan Jaga Rahasia Pelapor) -->
+                <div class="flex items-center gap-3 p-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-left text-xs text-slate-600">
+                    <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="font-bold text-slate-900">Jaminan Kerahasiaan Pelapor:</span>
+                        Data nama dan kontak Anda dienkripsi serta dirahasiakan dari publik. Hanya admin dan teknisi yang memproses penanganan kendala ini.
                     </div>
                 </div>
             </div>
@@ -234,10 +266,31 @@
 
                     <!-- SECTION 2: Lokasi & Perangkat -->
                     <div class="space-y-4">
-                        <div class="flex items-center gap-2 text-xs font-bold text-indigo-700 uppercase tracking-wider">
-                            <span class="w-6 h-6 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 text-xs">2</span>
-                            <span>Lokasi Laboratorium & Fasilitas</span>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2 text-xs font-bold text-indigo-700 uppercase tracking-wider">
+                                <span class="w-6 h-6 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 text-xs">2</span>
+                                <span>Lokasi Laboratorium & Fasilitas</span>
+                            </div>
+                            @if(request('facility_id') || request('lab_id'))
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">
+                                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Unit Terdeteksi via QR Code
+                                </span>
+                            @endif
                         </div>
+
+                        @if(request('facility_id') || request('lab_id'))
+                            <div class="p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3 text-emerald-900 text-xs">
+                                <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+                                </svg>
+                                <div>
+                                    <strong>Unit QR Code Terdeteksi Otomatis:</strong> Data ruangan dan perangkat telah otomatis terpilih sesuai stiker barcode unit yang Anda scan.
+                                </div>
+                            </div>
+                        @endif
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <!-- Laboratorium -->
@@ -248,7 +301,7 @@
                                 <select id="laboratory_id" name="laboratory_id" required class="w-full py-2.5 px-3.5 rounded-xl border border-slate-300 text-sm focus:border-indigo-600 bg-white transition">
                                     <option value="">-- Pilih Laboratorium --</option>
                                     @foreach($laboratories as $lab)
-                                        <option value="{{ $lab['id'] }}" {{ old('laboratory_id') == $lab['id'] ? 'selected' : '' }}>
+                                        <option value="{{ $lab['id'] }}" {{ old('laboratory_id', request('lab_id')) == $lab['id'] ? 'selected' : '' }}>
                                             {{ $lab['nama_lab'] }} ({{ $lab['lokasi'] }})
                                         </option>
                                     @endforeach
@@ -266,7 +319,7 @@
                                 <select id="facility_id" name="facility_id" required class="w-full py-2.5 px-3.5 rounded-xl border border-slate-300 text-sm focus:border-indigo-600 bg-white transition">
                                     <option value="">-- Pilih Fasilitas --</option>
                                     @foreach($facilities as $fac)
-                                        <option value="{{ $fac['id'] }}" {{ old('facility_id') == $fac['id'] ? 'selected' : '' }}>
+                                        <option value="{{ $fac['id'] }}" {{ old('facility_id', request('facility_id')) == $fac['id'] ? 'selected' : '' }}>
                                             {{ $fac['nama_fasilitas'] }} &mdash; [{{ strtoupper($fac['kategori']) }}]
                                         </option>
                                     @endforeach
@@ -279,9 +332,9 @@
                             <!-- Nomor PC / Meja -->
                             <div class="sm:col-span-2">
                                 <label for="nomor_pc" class="block text-xs font-bold text-slate-700 uppercase mb-1.5">
-                                    Nomor PC / Posisi Meja <span class="text-slate-400 font-normal normal-case">(Opsional)</span>
+                                    Nomor PC / Posisi Meja <span class="text-slate-400 font-normal normal-case">(Opsional / Sesuai Stiker Unit)</span>
                                 </label>
-                                <input type="text" id="nomor_pc" name="nomor_pc" value="{{ old('nomor_pc') }}" placeholder="Contoh: PC-04, Meja Baris 3 Sebelah Kiri, atau Switch Rack Utama" class="w-full py-2.5 px-3.5 rounded-xl border border-slate-300 text-sm focus:border-indigo-600 transition" />
+                                <input type="text" id="nomor_pc" name="nomor_pc" value="{{ old('nomor_pc', request('pc')) }}" placeholder="Contoh: PC-04, Meja Baris 3 Sebelah Kiri, atau Switch Rack Utama" class="w-full py-2.5 px-3.5 rounded-xl border border-slate-300 text-sm focus:border-indigo-600 transition" />
                             </div>
                         </div>
                     </div>

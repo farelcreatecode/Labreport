@@ -18,6 +18,7 @@ Route::get('/', [PelaporController::class, 'create'])->name('home');
 Route::get('/lapor', [PelaporController::class, 'create'])->name('pelapor.create');
 Route::post('/lapor', [PelaporController::class, 'store'])->name('pelapor.store');
 Route::get('/lacak', [PelaporController::class, 'track'])->name('pelapor.track');
+Route::get('/hasil-laporan', [PelaporController::class, 'track'])->name('pelapor.results');
 
 // Autentikasi Admin
 Route::get('/login', [AdminAuthController::class, 'showLogin'])->name('login');

@@ -14,9 +14,6 @@
                     </svg>
                     <span>Kelola Semua Laporan</span>
                 </a>
-                <a href="{{ route('admin.statistics.index') }}" class="px-4 py-2.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl text-xs font-bold transition shadow-xs">
-                    Statistik
-                </a>
             </div>
         </div>
     </x-slot>
@@ -30,7 +27,73 @@
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-7">
 
-            <!-- 4 Status Summary Cards with Micro-Interaction -->
+            <!-- 3 Category Cards: 1. Tentang Software, 2. Tentang Hardware, 3. Tentang Jaringan -->
+            <div>
+                <div class="flex items-center justify-between mb-3.5">
+                    <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+                        <span>Ringkasan Laporan Berdasarkan Kategori</span>
+                    </h3>
+                    <span class="text-xs text-slate-400">Klik kartu untuk memfilter laporan</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <!-- 1. Tentang Software -->
+                    <a href="{{ route('admin.complaints.index', ['kategori' => 'software']) }}" class="group bg-white p-6 rounded-3xl border border-purple-100 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all border-l-4 border-l-purple-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-xs font-extrabold text-purple-700 uppercase tracking-wider">1. Tentang Software</span>
+                                <div class="text-3xl font-black text-slate-900 mt-2 group-hover:text-purple-600 transition-colors">
+                                    {{ $categories['software'] }} <span class="text-xs text-slate-400 font-semibold font-normal">Laporan</span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-1">Sistem Operasi, Aplikasi Lab & Lisensi</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 group-hover:bg-purple-600 group-hover:text-white flex items-center justify-center transition-all shadow-xs">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- 2. Tentang Hardware -->
+                    <a href="{{ route('admin.complaints.index', ['kategori' => 'hardware']) }}" class="group bg-white p-6 rounded-3xl border border-blue-100 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all border-l-4 border-l-blue-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-xs font-extrabold text-blue-700 uppercase tracking-wider">2. Tentang Hardware</span>
+                                <div class="text-3xl font-black text-slate-900 mt-2 group-hover:text-blue-600 transition-colors">
+                                    {{ $categories['hardware'] }} <span class="text-xs text-slate-400 font-semibold font-normal">Laporan</span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-1">PC, Monitor, Keyboard, Mouse & Printer</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center transition-all shadow-xs">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- 3. Tentang Jaringan -->
+                    <a href="{{ route('admin.complaints.index', ['kategori' => 'jaringan']) }}" class="group bg-white p-6 rounded-3xl border border-emerald-100 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all border-l-4 border-l-emerald-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-xs font-extrabold text-emerald-700 uppercase tracking-wider">3. Tentang Jaringan</span>
+                                <div class="text-3xl font-black text-slate-900 mt-2 group-hover:text-emerald-600 transition-colors">
+                                    {{ $categories['jaringan'] }} <span class="text-xs text-slate-400 font-semibold font-normal">Laporan</span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-1">Kabel LAN, WiFi Lab, Switch & Router</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white flex items-center justify-center transition-all shadow-xs">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Status Laporan Overview -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <!-- Total -->
                 <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all">
@@ -85,63 +148,6 @@
                     <div class="text-3xl font-black text-emerald-600 mt-2">{{ $counts['selesai'] }}</div>
                     <p class="text-[11px] text-emerald-700/80 mt-1">Tuntas dan berfungsi normal</p>
                 </div>
-            </div>
-
-            <!-- 3 Category Banner Cards with Floating Hover -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <!-- Software -->
-                <a href="{{ route('admin.complaints.index', ['kategori' => 'software']) }}" class="group bg-white p-6 rounded-3xl border border-purple-100 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all border-l-4 border-l-purple-500">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <span class="text-xs font-extrabold text-purple-700 uppercase tracking-wider">Laporan Software</span>
-                            <div class="text-3xl font-black text-slate-900 mt-2 group-hover:text-purple-600 transition-colors">
-                                {{ $categories['software'] }}
-                            </div>
-                            <p class="text-xs text-slate-400 mt-1">Aplikasi, OS, Lisensi & Konfigurasi</p>
-                        </div>
-                        <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 group-hover:bg-purple-600 group-hover:text-white flex items-center justify-center transition-all shadow-xs">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
-                            </svg>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Hardware -->
-                <a href="{{ route('admin.complaints.index', ['kategori' => 'hardware']) }}" class="group bg-white p-6 rounded-3xl border border-blue-100 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all border-l-4 border-l-blue-500">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <span class="text-xs font-extrabold text-blue-700 uppercase tracking-wider">Laporan Hardware</span>
-                            <div class="text-3xl font-black text-slate-900 mt-2 group-hover:text-blue-600 transition-colors">
-                                {{ $categories['hardware'] }}
-                            </div>
-                            <p class="text-xs text-slate-400 mt-1">PC, Monitor, Keyboard, Mouse & Printer</p>
-                        </div>
-                        <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center transition-all shadow-xs">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                            </svg>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Jaringan -->
-                <a href="{{ route('admin.complaints.index', ['kategori' => 'jaringan']) }}" class="group bg-white p-6 rounded-3xl border border-teal-100 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all border-l-4 border-l-teal-500">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <span class="text-xs font-extrabold text-teal-700 uppercase tracking-wider">Laporan Jaringan</span>
-                            <div class="text-3xl font-black text-slate-900 mt-2 group-hover:text-teal-600 transition-colors">
-                                {{ $categories['jaringan'] }}
-                            </div>
-                            <p class="text-xs text-slate-400 mt-1">Kabel LAN, Switch Hub, Router & Internet</p>
-                        </div>
-                        <div class="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 group-hover:bg-teal-600 group-hover:text-white flex items-center justify-center transition-all shadow-xs">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>
-                            </svg>
-                        </div>
-                    </div>
-                </a>
             </div>
 
             <!-- Tabel 5 Laporan Terbaru -->

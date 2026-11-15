@@ -142,6 +142,7 @@ class PublicReportController extends Controller
 
     /**
      * Cek status laporan publik menggunakan kode laporan
+     * Mematuhi privasi: Data nama dan kontak pelapor disamarkan untuk publik.
      */
     public function showPublic(string $kode): JsonResponse
     {
@@ -162,9 +163,94 @@ class PublicReportController extends Controller
             ], 404);
         }
 
+        $reportData = $report->toArray();
+        // Privasi Pelapor (Sesuai Arahan: Utamakan Jaga Rahasia Pelapor)
+        $reportData['nama_pelapor_masked'] = $this->maskName($report->nama_pelapor);
+        $reportData['kontak_pelapor_masked'] = $this->maskContact($report->kontak_pelapor);
+        $reportData['nama_pelapor'] = $reportData['nama_pelapor_masked'];
+        $reportData['kontak_pelapor'] = $reportData['kontak_pelapor_masked'];
+
+        if (! empty($reportData['histories'])) {
+            foreach ($reportData['histories'] as &$history) {
+                if (isset($history['changed_by']) && str_contains($history['changed_by'], 'Pelapor')) {
+                    $history['changed_by'] = 'Pelapor (Data Terlindungi)';
+                }
+            }
+        }
+
         return response()->json([
             'success' => true,
-            'data'    => $report,
+            'data'    => $reportData,
         ]);
+    }
+
+    /**
+     * Daftar Hasil Laporan Terkini untuk Publik
+     * Menampilkan transparansi perbaikan fasilitas tanpa membocorkan identitas pelapor.
+     */
+    public function recentResults(): JsonResponse
+    {
+        $reports = Report::with([
+            'laboratory:id,nama_lab,lokasi',
+            'facility:id,nama_fasilitas,kategori',
+            'technician:id,nama,spesialisasi',
+        ])
+        ->select('id', 'kode_laporan', 'nama_pelapor', 'laboratory_id', 'facility_id', 'nomor_pc', 'deskripsi_masalah', 'status', 'created_at', 'updated_at', 'technician_id')
+        ->orderByDesc('updated_at')
+        ->limit(15)
+        ->get();
+
+        $maskedReports = $reports->map(function ($r) {
+            return [
+                'id'                => $r->id,
+                'kode_laporan'      => $r->kode_laporan,
+                'nama_pelapor'      => $this->maskName($r->nama_pelapor),
+                'laboratorium'      => $r->laboratory ? $r->laboratory->nama_lab : '-',
+                'lokasi'            => $r->laboratory ? $r->laboratory->lokasi : '-',
+                'fasilitas'         => $r->facility ? $r->facility->nama_fasilitas : '-',
+                'kategori'          => $r->facility ? $r->facility->kategori : 'hardware',
+                'nomor_pc'          => $r->nomor_pc,
+                'deskripsi_masalah' => $r->deskripsi_masalah,
+                'status'            => $r->status,
+                'teknisi'           => $r->technician ? $r->technician->nama : 'Menunggu Teknisi',
+                'tanggal'           => $r->created_at->format('d M Y H:i'),
+                'tanggal_update'    => $r->updated_at->format('d M Y H:i'),
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data'    => $maskedReports,
+        ]);
+    }
+
+    /**
+     * Samarkan nama pelapor untuk melindungi privasi (misal: "Ahmad Farel" -> "Ah*** Fa***")
+     */
+    private function maskName(string $name): string
+    {
+        $parts = explode(' ', trim($name));
+        $masked = array_map(function ($part) {
+            $len = mb_strlen($part);
+            if ($len <= 2) {
+                return $part[0] . '*';
+            }
+            return mb_substr($part, 0, 2) . str_repeat('*', max(1, $len - 2));
+        }, $parts);
+
+        return implode(' ', $masked);
+    }
+
+    /**
+     * Samarkan kontak nomor/email pelapor (misal: "081234567890" -> "0812****890")
+     */
+    private function maskContact(string $contact): string
+    {
+        $trimmed = trim($contact);
+        $len = strlen($trimmed);
+        if ($len <= 4) {
+            return '****';
+        }
+        return substr($trimmed, 0, 4) . str_repeat('*', max(3, $len - 7)) . substr($trimmed, -3);
     }
 }

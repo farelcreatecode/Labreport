@@ -62,18 +62,24 @@
             <a href="{{ route('pelapor.create') }}" class="flex items-center gap-3 group">
                 <div class="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-all">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-base font-black text-slate-900 tracking-tight">LabReport</h1>
-                    <p class="text-xs text-slate-400">Kembali ke Form Laporan</p>
+                    <h1 class="text-base font-black text-slate-900 tracking-tight flex items-center gap-2">
+                        <span>LabReport</span>
+                        <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100">Portal Publik</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Hasil Penanganan & Pelacakan Tiket</p>
                 </div>
             </a>
 
             <div class="flex items-center gap-3">
-                <a href="{{ route('pelapor.create') }}" class="px-4 py-2 text-xs sm:text-sm font-bold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-xl transition">
-                    + Buat Laporan Baru
+                <a href="{{ route('pelapor.create') }}" class="inline-flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm font-bold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-xl transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    <span>Buat Laporan Baru</span>
                 </a>
             </div>
         </div>
@@ -207,9 +213,12 @@
                     <!-- Grid Info Rinci -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-5 bg-slate-50 rounded-2xl border border-slate-100">
                         <div>
-                            <span class="text-xs text-slate-400 uppercase font-bold">Identitas Pelapor</span>
+                            <span class="text-xs text-slate-400 uppercase font-bold flex items-center gap-1.5">
+                                <span>Identitas Pelapor</span>
+                                <span class="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-semibold border border-emerald-200">Privasi Terlindungi</span>
+                            </span>
                             <div class="font-extrabold text-slate-900 mt-0.5">{{ $report['nama_pelapor'] }}</div>
-                            <div class="text-xs text-slate-500">{{ $report['kontak_pelapor'] }}</div>
+                            <div class="text-xs text-slate-500 font-mono">{{ $report['kontak_pelapor'] }}</div>
                         </div>
 
                         <div>
@@ -306,7 +315,86 @@
                         </div>
                     @endif
                 </div>
-            @endif
+            <!-- Daftar Hasil Penanganan Laporan Terkini (Menu Hasil Laporan Publik) -->
+            <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-200/80 p-6 sm:p-8 space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-lg font-black text-slate-900 tracking-tight">Hasil Penanganan Laporan Terkini</h3>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Transparansi Lab</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-0.5">Daftar pembaruan status perbaikan fasilitas di seluruh laboratorium komputer</p>
+                    </div>
+                    <div class="text-[11px] text-slate-400 italic">
+                        *Identitas pelapor disamarkan demi privasi
+                    </div>
+                </div>
+
+                @if(!empty($recentReports) && count($recentReports) > 0)
+                    <div class="space-y-3">
+                        @foreach($recentReports as $item)
+                            @php
+                                $itemStatus = $item['status'];
+                                $itemBadge = match($itemStatus) {
+                                    'pending'  => 'bg-amber-100 text-amber-800 border-amber-200',
+                                    'diproses' => 'bg-blue-100 text-blue-800 border-blue-200',
+                                    'selesai'  => 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                                    'ditolak'  => 'bg-rose-100 text-rose-800 border-rose-200',
+                                    default    => 'bg-slate-100 text-slate-800 border-slate-200',
+                                };
+                                $katBadge = match(strtolower($item['kategori'])) {
+                                    'software' => 'bg-purple-50 text-purple-700 border-purple-200',
+                                    'hardware' => 'bg-blue-50 text-blue-700 border-blue-200',
+                                    'jaringan' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                                    default    => 'bg-slate-50 text-slate-700 border-slate-200',
+                                };
+                            @endphp
+                            <div class="p-4 rounded-2xl border border-slate-100 bg-slate-50/60 hover:bg-white hover:border-indigo-100 hover:shadow-md transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div class="space-y-1.5 flex-1">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <span class="font-mono text-xs font-bold text-indigo-700">{{ $item['kode_laporan'] }}</span>
+                                        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border {{ $katBadge }}">
+                                            {{ $item['kategori'] }}
+                                        </span>
+                                        <span class="text-[11px] font-bold px-2 py-0.5 rounded-full border {{ $itemBadge }}">
+                                            {{ ucfirst($itemStatus) }}
+                                        </span>
+                                    </div>
+                                    <div class="text-sm font-bold text-slate-900">
+                                        {{ $item['fasilitas'] }}
+                                        @if(!empty($item['nomor_pc']))
+                                            <span class="text-slate-400 font-normal">({{ $item['nomor_pc'] }})</span>
+                                        @endif
+                                        &bull; <span class="text-xs text-slate-600 font-medium">{{ $item['laboratorium'] }}</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500 line-clamp-1">
+                                        {{ $item['deskripsi_masalah'] }}
+                                    </p>
+                                    <div class="flex items-center gap-3 text-[11px] text-slate-400 pt-0.5">
+                                        <span>Pelapor: <strong class="text-slate-600">{{ $item['nama_pelapor'] }}</strong></span>
+                                        <span>&bull;</span>
+                                        <span>Teknisi: <strong class="text-indigo-600">{{ $item['teknisi'] }}</strong></span>
+                                        <span>&bull;</span>
+                                        <span>{{ $item['tanggal_update'] }}</span>
+                                    </div>
+                                </div>
+                                <div class="shrink-0">
+                                    <a href="{{ route('pelapor.track', ['kode' => $item['kode_laporan']]) }}" class="px-3.5 py-2 text-xs font-bold bg-white hover:bg-indigo-50 text-indigo-600 hover:text-indigo-700 border border-slate-200 hover:border-indigo-200 rounded-xl transition inline-flex items-center gap-1.5 shadow-xs">
+                                        <span>Cek Progres</span>
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="text-center py-8 text-xs text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                        Belum ada laporan perbaikan yang tercatat.
+                    </div>
+                @endif
+            </div>
 
         </div>
     </main>

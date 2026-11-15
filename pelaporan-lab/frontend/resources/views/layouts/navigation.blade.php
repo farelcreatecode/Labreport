@@ -48,10 +48,6 @@
                             <a href="{{ route('admin.technicians.index') }}" class="flex items-center px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition">
                                 Teknisi Lapangan
                             </a>
-                            <div class="border-t border-slate-100 my-1.5"></div>
-                            <a href="{{ route('admin.statistics.index') }}" class="flex items-center px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition">
-                                Statistik Lengkap
-                            </a>
                         </div>
                     </div>
 
@@ -112,9 +108,6 @@
         </a>
         <a href="{{ route('admin.technicians.index') }}" class="block px-3 py-1.5 text-xs font-semibold text-slate-700">
             Data Teknisi Lapangan
-        </a>
-        <a href="{{ route('admin.statistics.index') }}" class="block px-3 py-1.5 text-xs font-semibold text-slate-700">
-            Statistik Lengkap
         </a>
         <div class="border-t border-slate-100 pt-3 flex items-center justify-between">
             <span class="text-xs font-bold text-slate-800">{{ session('admin_user.name', 'Administrator') }}</span>
