@@ -1,106 +1,91 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100 shadow-sm">
+<nav x-data="{ open: false }" class="bg-white/95 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-30 shadow-xs">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
-            <div class="flex">
+            <div class="flex items-center gap-8">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('admin.dashboard') }}" class="font-bold text-xl text-indigo-600 flex items-center gap-2">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                        </svg>
-                        <span>LabReport</span>
+                    <a href="{{ route('admin.dashboard') }}" class="font-black text-xl text-slate-900 flex items-center gap-2.5 group">
+                        <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span>LabReport</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 uppercase tracking-widest">Admin</span>
+                        </div>
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                <div class="hidden sm:flex sm:items-center sm:gap-1">
+                    <a href="{{ route('admin.dashboard') }}" class="px-3.5 py-2 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('admin.dashboard') ? 'bg-indigo-50 text-indigo-700 shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70' }}">
                         Dashboard
-                    </x-nav-link>
+                    </a>
 
-                    <x-nav-link :href="route('admin.complaints.index')" :active="request()->routeIs('admin.complaints.*')">
+                    <a href="{{ route('admin.complaints.index') }}" class="px-3.5 py-2 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('admin.complaints.*') ? 'bg-indigo-50 text-indigo-700 shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70' }}">
                         Kelola Laporan
-                    </x-nav-link>
+                    </a>
 
                     <!-- Dropdown Master Data -->
-                    <div class="inline-flex items-center">
-                        <x-dropdown align="left" width="48">
-                            <x-slot name="trigger">
-                                <button class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium leading-5 transition duration-150 ease-in-out {{ request()->routeIs('admin.facilities.*') || request()->routeIs('admin.labs.*') || request()->routeIs('admin.technicians.*') || request()->routeIs('admin.statistics.*') ? 'border-indigo-500 text-gray-900 font-semibold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
-                                    <span>Data Master</span>
-                                    <svg class="ms-1.5 h-4 w-4 fill-current text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                    </svg>
-                                </button>
-                            </x-slot>
+                    <div class="relative" x-data="{ dropdownOpen: false }">
+                        <button @click="dropdownOpen = !dropdownOpen" @click.away="dropdownOpen = false" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-bold transition-all {{ request()->routeIs('admin.facilities.*') || request()->routeIs('admin.labs.*') || request()->routeIs('admin.technicians.*') || request()->routeIs('admin.statistics.*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70' }}">
+                            <span>Data Master</span>
+                            <svg class="h-4 w-4 text-slate-400 transition-transform duration-200" :class="{'rotate-180': dropdownOpen}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
 
-                            <x-slot name="content">
-                                <div class="px-3 py-1 text-xs font-bold text-gray-400 uppercase tracking-wider">Master Data</div>
-                                <x-dropdown-link :href="route('admin.labs.index')">
-                                    Data Laboratorium
-                                </x-dropdown-link>
-                                <x-dropdown-link :href="route('admin.facilities.index')">
-                                    Data Fasilitas & Unit
-                                </x-dropdown-link>
-                                <x-dropdown-link :href="route('admin.technicians.index')">
-                                    Data Teknisi Lapangan
-                                </x-dropdown-link>
-                                <div class="border-t border-gray-100 my-1"></div>
-                                <x-dropdown-link :href="route('admin.statistics.index')">
-                                    Statistik Lengkap
-                                </x-dropdown-link>
-                            </x-slot>
-                        </x-dropdown>
+                        <div x-show="dropdownOpen" x-cloak x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute left-0 mt-2 w-56 rounded-2xl bg-white shadow-xl shadow-slate-200/50 border border-slate-100 py-2 z-50">
+                            <div class="px-4 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Master Laboratorium</div>
+                            <a href="{{ route('admin.labs.index') }}" class="flex items-center px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition">
+                                Ruang Laboratorium
+                            </a>
+                            <a href="{{ route('admin.facilities.index') }}" class="flex items-center px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition">
+                                Fasilitas & Unit PC
+                            </a>
+                            <a href="{{ route('admin.technicians.index') }}" class="flex items-center px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition">
+                                Teknisi Lapangan
+                            </a>
+                            <div class="border-t border-slate-100 my-1.5"></div>
+                            <a href="{{ route('admin.statistics.index') }}" class="flex items-center px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition">
+                                Statistik Lengkap
+                            </a>
+                        </div>
                     </div>
 
-                    <a href="{{ route('pelapor.create') }}" target="_blank" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-400 hover:text-indigo-600 transition">
-                        Portal Publik &nearr;
+                    <!-- Direct link ke Public Portal -->
+                    <a href="{{ route('pelapor.create') }}" target="_blank" class="inline-flex items-center gap-1 px-3 py-2 text-xs font-semibold text-slate-400 hover:text-indigo-600 transition">
+                        <span>Portal Publik</span>
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                        </svg>
                     </a>
                 </div>
             </div>
 
-            <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <span class="me-3 px-2.5 py-0.5 rounded text-xs font-semibold bg-indigo-100 text-indigo-800 uppercase">
-                    {{ session('admin_user.role', 'ADMIN') }}
+            <!-- Settings / User Dropdown -->
+            <div class="hidden sm:flex sm:items-center sm:gap-3">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>
+                    <span>{{ session('admin_user.name', 'Administrator') }}</span>
                 </span>
 
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ session('admin_user.name', 'Administrator') }}</div>
-
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </button>
-                    </x-slot>
-
-                    <x-slot name="content">
-                        <div class="px-4 py-2 text-xs text-gray-400">
-                            {{ session('admin_user.email', 'admin@labreport.com') }}
-                        </div>
-                        <div class="border-t border-gray-100"></div>
-
-                        <!-- Authentication -->
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
-                        </form>
-                    </x-slot>
-                </x-dropdown>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="px-3 py-1.5 text-xs font-bold text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                        <span>Keluar</span>
+                    </button>
+                </form>
             </div>
 
-            <!-- Hamburger -->
+            <!-- Hamburger Button for Mobile -->
             <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
+                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -110,47 +95,33 @@
         </div>
     </div>
 
-    <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
-                Dashboard
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('admin.complaints.index')" :active="request()->routeIs('admin.complaints.*')">
-                Kelola Laporan
-            </x-responsive-nav-link>
-            <div class="pt-2 pb-1 px-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Data Master</div>
-            <x-responsive-nav-link :href="route('admin.labs.index')" :active="request()->routeIs('admin.labs.*')">
-                Data Laboratorium
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('admin.facilities.index')" :active="request()->routeIs('admin.facilities.*')">
-                Data Fasilitas & Unit
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('admin.technicians.index')" :active="request()->routeIs('admin.technicians.*')">
-                Data Teknisi Lapangan
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('admin.statistics.index')" :active="request()->routeIs('admin.statistics.*')">
-                Statistik Lengkap
-            </x-responsive-nav-link>
-        </div>
-
-        <!-- Responsive Settings Options -->
-        <div class="pt-4 pb-1 border-t border-gray-200">
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ session('admin_user.name', 'Administrator') }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ session('admin_user.email', 'admin@labreport.com') }}</div>
-            </div>
-
-            <div class="mt-3 space-y-1">
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
-                                        this.closest('form').submit();">
-                        {{ __('Log Out') }}
-                    </x-responsive-nav-link>
-                </form>
-            </div>
+    <!-- Mobile Drawer -->
+    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden border-t border-slate-200/80 bg-white px-4 pt-3 pb-5 space-y-2">
+        <a href="{{ route('admin.dashboard') }}" class="block px-3 py-2 rounded-xl text-sm font-bold {{ request()->routeIs('admin.dashboard') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-700' }}">
+            Dashboard
+        </a>
+        <a href="{{ route('admin.complaints.index') }}" class="block px-3 py-2 rounded-xl text-sm font-bold {{ request()->routeIs('admin.complaints.*') ? 'bg-indigo-50 text-indigo-700' : 'text-slate-700' }}">
+            Kelola Laporan
+        </a>
+        <div class="pt-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3">Data Master</div>
+        <a href="{{ route('admin.labs.index') }}" class="block px-3 py-1.5 text-xs font-semibold text-slate-700">
+            Data Laboratorium
+        </a>
+        <a href="{{ route('admin.facilities.index') }}" class="block px-3 py-1.5 text-xs font-semibold text-slate-700">
+            Data Fasilitas & Unit
+        </a>
+        <a href="{{ route('admin.technicians.index') }}" class="block px-3 py-1.5 text-xs font-semibold text-slate-700">
+            Data Teknisi Lapangan
+        </a>
+        <a href="{{ route('admin.statistics.index') }}" class="block px-3 py-1.5 text-xs font-semibold text-slate-700">
+            Statistik Lengkap
+        </a>
+        <div class="border-t border-slate-100 pt-3 flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-800">{{ session('admin_user.name', 'Administrator') }}</span>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="text-xs font-bold text-rose-600">Logout</button>
+            </form>
         </div>
     </div>
 </nav>
