@@ -1,59 +1,73 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistem Informasi Pelaporan Fasilitas Laboratorium Komputer (LabReport)
+## Arsitektur Microservices Laravel
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Project ini adalah implementasi sistem pelaporan fasilitas laboratorium komputer berbasis **Microservices Architecture** menggunakan framework Laravel, terbagi menjadi beberapa layanan independen dengan basis data terisolasi.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📁 Struktur Direktori Project
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+```text
+Backend Micro/
+├── pelaporan-lab/               # ARSITEKTUR UTAMA MICROSERVICES
+│   ├── frontend/                # Port 8000 (UI/UX Pelapor & Admin)
+│   ├── api-gateway/             # Port 8001 (Reverse Proxy & Routing)
+│   ├── auth-service/            # Port 8002 (Autentikasi Admin, DB: db_auth)
+│   ├── report-service/          # Port 8003 (Proses Bisnis Laporan, DB: db_report)
+│   ├── docs/                    # Koleksi Postman API & Panduan Teknis
+│   ├── tests/                   # Skrip Pengujian Otomatis End-to-End
+│   ├── start-microservices.bat  # Script Peluncur Semua Layanan
+│   └── stop-microservices.bat   # Script Penghenti Semua Layanan
+│
+├── arsip-monolith/              # CADANGAN ARSIP MONOLITH LAMA (Diisolasi)
+│   ├── app/
+│   ├── database/
+│   ├── resources/
+│   ├── routes/
+│   └── .env                     # Konfigurasi Monolith Lama (db_pengaduan_lab)
+│
+├── start-microservices.bat      # Shortcut Peluncur Layanan dari Root
+├── stop-microservices.bat       # Shortcut Penghenti Layanan dari Root
+└── README.md                    # Dokumentasi Proyek
+```
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🚀 Pembagian Layanan & Port
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+| Layanan | Direktori | Port | Database | Deskripsi |
+| :--- | :--- | :---: | :---: | :--- |
+| **Frontend Portal** | `pelaporan-lab/frontend` | `8000` | *None* | Portal Publik (Mahasiswa) & Dashboard Admin. Murni memanggil API Gateway. |
+| **API Gateway** | `pelaporan-lab/api-gateway` | `8001` | *None* | Gerbang utama yang merutekan request ke service yang tepat. |
+| **Auth Service** | `pelaporan-lab/auth-service` | `8002` | `db_auth` | Autentikasi Admin & penerbitan Bearer Token Sanctum. |
+| **Report Service** | `pelaporan-lab/report-service` | `8003` | `db_report` | Layanan pelaporan kerusakan publik, QR Code unit lab, dan penugasan teknisi. |
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## ⚡ Cara Menjalankan Sistem
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+1. Pastikan **MySQL di Laragon** sudah berjalan (Host: `127.0.0.1:3306`, User: `root`, Password kosong).
+2. Database yang digunakan:
+   - `db_auth` (untuk Auth Service)
+   - `db_report` (untuk Report Service)
+3. Cukup **double-click** file:
+   ```cmd
+   start-microservices.bat
+   ```
+   Keempat terminal layanan (`frontend`, `api-gateway`, `auth-service`, dan `report-service`) akan terbuka dan berjalan otomatis.
+4. Buka browser:
+   - **Portal Pelapor (Publik / Tanpa Login):** [http://127.0.0.1:8000/lapor](http://127.0.0.1:8000/lapor)
+   - **Hasil & Lacak Laporan Publik:** [http://127.0.0.1:8000/lacak](http://127.0.0.1:8000/lacak)
+   - **Login Administrator:** [http://127.0.0.1:8000/login](http://127.0.0.1:8000/login)
+     * *Email:* `admin@labreport.com`
+     * *Password:* `password`
+5. Untuk menghentikan semua layanan:
+   ```cmd
+   stop-microservices.bat
+   ```
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 🛡️ Jaminan Privasi Pelapor & Fitur QR Code
+* **Kerahasiaan Pelapor:** Nama dan kontak pelapor disamarkan secara otomatis di antarmuka publik demi menjaga privasi mahasiswa/pelapor.
+* **Stiker QR Code Fasilitas:** Setiap unit komputer memiliki QR Code di halaman master fasilitas (`/admin/facilities`) yang dapat dicetak dan ditempel pada perangkat laboratorium untuk pelaporan cepat dengan deteksi lokasi otomatis.

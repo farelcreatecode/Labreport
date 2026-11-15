@@ -1,6 +1,7 @@
 *.log
 .DS_Store
 .env
+.env.*
 .env.backup
 .env.production
 .phpactor.json
@@ -12,15 +13,24 @@
 /.vscode
 /.zed
 /auth.json
-/node_modules
+node_modules/
+vendor/
 /public/build
 /public/hot
 /public/storage
-/storage/*.key
-/storage/pail
-/vendor
-vendor/
-node_modules/
-Homestead.json
-Homestead.yaml
-Thumbs.db
+storage/*.key
+storage/pail
+
+# Arsip monolith ignores
+arsip-monolith/.env
+arsip-monolith/vendor/
+arsip-monolith/node_modules/
+arsip-monolith/storage/*.key
+arsip-monolith/public/storage
+
+# Pelaporan Lab Microservices ignores
+pelaporan-lab/*/vendor/
+pelaporan-lab/*/node_modules/
+pelaporan-lab/*/.env
+pelaporan-lab/*/storage/*.key
+pelaporan-lab/*/public/storage
