@@ -18,7 +18,9 @@ Route::get('/health', function () {
 });
 
 // Proxy ke Auth Service
-Route::any('/auth/{any?}', [GatewayController::class, 'forwardAuth'])->where('any', '.*');
+Route::any('/auth/{any?}', function (Illuminate\Http\Request $request, $any = '') {
+    return app(GatewayController::class)->forwardAuth($request, $any);
+})->where('any', '.*');
 
 // Proxy ke Report Service (Public & Admin)
 Route::any('/public/{any?}', function (Illuminate\Http\Request $request, $any = '') {

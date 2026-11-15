@@ -56,7 +56,7 @@ echo "   -> Data Laporan Awal : {$repCount} laporan.\n";
 echo "   -> Status: " . ($labCount > 0 && $facCount > 0 && $techCount > 0 ? "[PASS]\n" : "[FAIL]\n");
 
 echo "\n[TEST 3] Simulasi Submit Laporan Publik (Pelapor Tanpa Login)...\n";
-$kodeBaru = '#LR-' . date('Ym') . '-9999';
+$kodeBaru = '#LR-' . date('Ym') . '-' . rand(1000, 9999);
 $stmt = $reportPdo->prepare("INSERT INTO reports (kode_laporan, nama_pelapor, kontak_pelapor, laboratory_id, facility_id, nomor_pc, deskripsi_masalah, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
 $stmt->execute([$kodeBaru, 'Dimas Anggara', '089912345678', 1, 1, 'PC-09', 'Monitor blank tidak menyala saat ditekan power.', 'pending']);
 $newReportId = $reportPdo->lastInsertId();
