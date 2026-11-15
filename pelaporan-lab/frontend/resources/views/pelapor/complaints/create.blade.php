@@ -86,12 +86,38 @@
     </header>
 
     <!-- Main Content -->
-    <main class="py-10 px-4 sm:px-6 lg:px-8 flex-1 animate-fade-in">
+    <main class="py-10 px-4 sm:px-6 lg:px-8 flex-1 animate-fade-in" x-data="{
+        selectedCategory: '{{ request('kategori', '') }}',
+        filterCategory(cat) {
+            this.selectedCategory = (this.selectedCategory === cat) ? '' : cat;
+        },
+        charCount: 0,
+        fileName: '',
+        fileSize: '',
+        filePreviewUrl: null,
+        isSubmitting: false,
+        handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                this.fileName = file.name;
+                this.fileSize = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+                this.filePreviewUrl = URL.createObjectURL(file);
+            } else {
+                this.removeFile();
+            }
+        },
+        removeFile() {
+            this.fileName = '';
+            this.fileSize = '';
+            this.filePreviewUrl = null;
+            this.$refs.fileInput.value = '';
+        }
+    }">
         <div class="max-w-3xl mx-auto space-y-8">
 
             <!-- Hero Banner -->
             <div class="text-center space-y-3">
-                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800 shadow-xs">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-beacon"></span>
                     <span>Layanan Pengaduan Fasilitas Aktif &bull; Tanpa Perlu Login</span>
                 </div>
@@ -102,45 +128,100 @@
                     Sampaikan kendala komputer, jaringan, atau software laboratorium komputer. Laporan Anda langsung diteruskan kepada tim teknisi siaga.
                 </p>
 
-                <!-- 3 Card Panduan Kategori Kerusakan (Statistik Coret) -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-3 text-left">
-                    <!-- Card 1: Tentang Software -->
-                    <div class="bg-white p-4 rounded-2xl border border-purple-200/80 shadow-xs hover:shadow-md transition-all border-t-4 border-t-purple-600">
-                        <div class="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center mb-2.5">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
-                            </svg>
+                <!-- 3 Card Panduan Kategori Kerusakan Interaktif (Klik untuk Filter Fasilitas) -->
+                <div class="pt-2">
+                    <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 text-center">
+                        Pilih Kategori Kerusakan untuk Mempercepat Pengisian:
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-left">
+                        <!-- Card 1: Tentang Software -->
+                        <div @click="filterCategory('software')"
+                            :class="selectedCategory === 'software' ? 'ring-2 ring-purple-600 bg-purple-50/60 border-purple-500 shadow-md scale-[1.02]' : 'bg-white hover:scale-[1.01] hover:shadow-md border-purple-200/80'"
+                            class="p-4 rounded-2xl border transition-all text-left flex flex-col justify-between cursor-pointer border-t-4 border-t-purple-600 group relative">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                                        </svg>
+                                    </div>
+                                    <span x-show="selectedCategory === 'software'" x-cloak class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-600 text-white">
+                                        Aktif
+                                    </span>
+                                </div>
+                                <h4 class="text-xs font-black uppercase tracking-wider text-purple-700">1. Tentang Software</h4>
+                                <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                                    Aplikasi crash, lisensi software habis, sistem operasi (OS) bermasalah, atau terkena virus.
+                                </p>
+                            </div>
+                            <div class="mt-3 pt-2 border-t border-purple-100/60 text-[10px] font-bold text-purple-600 flex items-center justify-between">
+                                <span x-text="selectedCategory === 'software' ? 'Kategori Terpilih' : 'Klik untuk Pilih'">Klik untuk Pilih</span>
+                                <span>&rarr;</span>
+                            </div>
                         </div>
-                        <h4 class="text-xs font-black uppercase tracking-wider text-purple-700">1. Tentang Software</h4>
-                        <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">
-                            Aplikasi mata kuliah crash, lisensi software habis, sistem operasi (OS) bermasalah, atau terkena virus.
-                        </p>
+
+                        <!-- Card 2: Tentang Hardware -->
+                        <div @click="filterCategory('hardware')"
+                            :class="selectedCategory === 'hardware' ? 'ring-2 ring-blue-600 bg-blue-50/60 border-blue-500 shadow-md scale-[1.02]' : 'bg-white hover:scale-[1.01] hover:shadow-md border-blue-200/80'"
+                            class="p-4 rounded-2xl border transition-all text-left flex flex-col justify-between cursor-pointer border-t-4 border-t-blue-600 group relative">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="w-8 h-8 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </div>
+                                    <span x-show="selectedCategory === 'hardware'" x-cloak class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-600 text-white">
+                                        Aktif
+                                    </span>
+                                </div>
+                                <h4 class="text-xs font-black uppercase tracking-wider text-blue-700">2. Tentang Hardware</h4>
+                                <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                                    Unit PC mati, layar monitor bergaris/blank, mouse/keyboard tidak terdeteksi, power supply.
+                                </p>
+                            </div>
+                            <div class="mt-3 pt-2 border-t border-blue-100/60 text-[10px] font-bold text-blue-600 flex items-center justify-between">
+                                <span x-text="selectedCategory === 'hardware' ? 'Kategori Terpilih' : 'Klik untuk Pilih'">Klik untuk Pilih</span>
+                                <span>&rarr;</span>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Tentang Jaringan -->
+                        <div @click="filterCategory('jaringan')"
+                            :class="selectedCategory === 'jaringan' ? 'ring-2 ring-emerald-600 bg-emerald-50/60 border-emerald-500 shadow-md scale-[1.02]' : 'bg-white hover:scale-[1.01] hover:shadow-md border-emerald-200/80'"
+                            class="p-4 rounded-2xl border transition-all text-left flex flex-col justify-between cursor-pointer border-t-4 border-t-emerald-600 group relative">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>
+                                        </svg>
+                                    </div>
+                                    <span x-show="selectedCategory === 'jaringan'" x-cloak class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white">
+                                        Aktif
+                                    </span>
+                                </div>
+                                <h4 class="text-xs font-black uppercase tracking-wider text-emerald-700">3. Tentang Jaringan</h4>
+                                <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                                    Koneksi LAN putus, kabel lepas, akses internet lambat, IP conflict, switch/router lab.
+                                </p>
+                            </div>
+                            <div class="mt-3 pt-2 border-t border-emerald-100/60 text-[10px] font-bold text-emerald-600 flex items-center justify-between">
+                                <span x-text="selectedCategory === 'jaringan' ? 'Kategori Terpilih' : 'Klik untuk Pilih'">Klik untuk Pilih</span>
+                                <span>&rarr;</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Card 2: Tentang Hardware -->
-                    <div class="bg-white p-4 rounded-2xl border border-blue-200/80 shadow-xs hover:shadow-md transition-all border-t-4 border-t-blue-600">
-                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-2.5">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                            </svg>
+                    <!-- Notifikasi Filter Kategori Aktif -->
+                    <div x-show="selectedCategory" x-cloak class="mt-3 p-3 bg-indigo-50 border border-indigo-200 rounded-2xl flex items-center justify-between text-xs text-indigo-900 animate-fade-in">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-indigo-600 animate-beacon"></span>
+                            <span>Filter Aktif: Menampilkan opsi fasilitas kategori <strong class="uppercase font-bold" x-text="selectedCategory"></strong></span>
                         </div>
-                        <h4 class="text-xs font-black uppercase tracking-wider text-blue-700">2. Tentang Hardware</h4>
-                        <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">
-                            Unit PC mati total, monitor bergaris/blank, mouse atau keyboard tidak terdeteksi, power supply bermasalah.
-                        </p>
-                    </div>
-
-                    <!-- Card 3: Tentang Jaringan -->
-                    <div class="bg-white p-4 rounded-2xl border border-emerald-200/80 shadow-xs hover:shadow-md transition-all border-t-4 border-t-emerald-600">
-                        <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-2.5">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>
-                            </svg>
-                        </div>
-                        <h4 class="text-xs font-black uppercase tracking-wider text-emerald-700">3. Tentang Jaringan</h4>
-                        <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">
-                            Koneksi LAN putus, kabel lepas/rusak, akses internet lambat, IP conflict, atau kendala switch/router lab.
-                        </p>
+                        <button type="button" @click="selectedCategory = ''" class="px-2.5 py-1 bg-white hover:bg-slate-100 text-indigo-700 font-bold rounded-lg border border-indigo-200 shadow-xs transition">
+                            Tampilkan Semua
+                        </button>
                     </div>
                 </div>
 
@@ -183,29 +264,8 @@
             @endif
 
             <!-- Form Card Utama -->
-            <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-200/80 overflow-hidden" x-data="{
-                charCount: 0,
-                fileName: '',
-                fileSize: '',
-                filePreviewUrl: null,
-                handleFileSelect(event) {
-                    const file = event.target.files[0];
-                    if (file) {
-                        this.fileName = file.name;
-                        this.fileSize = (file.size / 1024 / 1024).toFixed(2) + ' MB';
-                        this.filePreviewUrl = URL.createObjectURL(file);
-                    } else {
-                        this.removeFile();
-                    }
-                },
-                removeFile() {
-                    this.fileName = '';
-                    this.fileSize = '';
-                    this.filePreviewUrl = null;
-                    this.$refs.fileInput.value = '';
-                }
-            }">
-                <div class="px-6 py-5 bg-gradient-to-r from-slate-900 to-indigo-950 text-white flex items-center justify-between">
+            <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-200/80 overflow-hidden">
+                <div class="px-6 py-5 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white flex items-center justify-between">
                     <div>
                         <h3 class="font-bold text-base">Formulir Laporan Baru</h3>
                         <p class="text-xs text-slate-300">Isi data di bawah dengan lengkap dan jelas</p>
@@ -215,7 +275,7 @@
                     </span>
                 </div>
 
-                <form method="POST" action="{{ route('pelapor.store') }}" enctype="multipart/form-data" class="p-6 sm:p-8 space-y-7">
+                <form method="POST" action="{{ route('pelapor.store') }}" enctype="multipart/form-data" @submit="isSubmitting = true" class="p-6 sm:p-8 space-y-7">
                     @csrf
 
                     <!-- SECTION 1: Identitas Pelapor -->
@@ -236,7 +296,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                         </svg>
                                     </div>
-                                    <input type="text" id="nama_pelapor" name="nama_pelapor" required value="{{ old('nama_pelapor') }}" placeholder="Contoh: Ahmad Fauzi" autocomplete="name" class="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:border-indigo-600 transition" />
+                                    <input type="text" id="nama_pelapor" name="nama_pelapor" required value="{{ old('nama_pelapor') }}" placeholder="Contoh: Ahmad Fauzi" autocomplete="name" class="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 transition" />
                                 </div>
                                 @error('nama_pelapor')
                                     <p class="text-xs text-rose-600 mt-1 font-medium">{{ $message }}</p>
@@ -253,7 +313,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                                         </svg>
                                     </div>
-                                    <input type="text" id="kontak_pelapor" name="kontak_pelapor" required value="{{ old('kontak_pelapor') }}" placeholder="08123456789 atau email@univ.ac.id" autocomplete="email" class="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:border-indigo-600 transition" />
+                                    <input type="text" id="kontak_pelapor" name="kontak_pelapor" required value="{{ old('kontak_pelapor') }}" placeholder="08123456789 atau email@univ.ac.id" autocomplete="email" class="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 transition" />
                                 </div>
                                 @error('kontak_pelapor')
                                     <p class="text-xs text-rose-600 mt-1 font-medium">{{ $message }}</p>
@@ -298,7 +358,7 @@
                                 <label for="laboratory_id" class="block text-xs font-bold text-slate-700 uppercase mb-1.5">
                                     Pilih Ruang Lab <span class="text-rose-500">*</span>
                                 </label>
-                                <select id="laboratory_id" name="laboratory_id" required class="w-full py-2.5 px-3.5 rounded-xl border border-slate-300 text-sm focus:border-indigo-600 bg-white transition">
+                                <select id="laboratory_id" name="laboratory_id" required class="w-full py-2.5 px-3.5 rounded-xl border border-slate-300 text-sm focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 bg-white transition">
                                     <option value="">-- Pilih Laboratorium --</option>
                                     @foreach($laboratories as $lab)
                                         <option value="{{ $lab['id'] }}" {{ old('laboratory_id', request('lab_id')) == $lab['id'] ? 'selected' : '' }}>
@@ -311,15 +371,20 @@
                                 @enderror
                             </div>
 
-                            <!-- Fasilitas -->
+                            <!-- Fasilitas dengan filter kategori reaktif -->
                             <div>
-                                <label for="facility_id" class="block text-xs font-bold text-slate-700 uppercase mb-1.5">
-                                    Fasilitas / Komponen <span class="text-rose-500">*</span>
-                                </label>
-                                <select id="facility_id" name="facility_id" required class="w-full py-2.5 px-3.5 rounded-xl border border-slate-300 text-sm focus:border-indigo-600 bg-white transition">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <label for="facility_id" class="block text-xs font-bold text-slate-700 uppercase">
+                                        Fasilitas / Komponen <span class="text-rose-500">*</span>
+                                    </label>
+                                    <span x-show="selectedCategory" x-cloak class="text-[10px] text-indigo-600 font-bold uppercase" x-text="'Filter: ' + selectedCategory"></span>
+                                </div>
+                                <select id="facility_id" name="facility_id" required class="w-full py-2.5 px-3.5 rounded-xl border border-slate-300 text-sm focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 bg-white transition">
                                     <option value="">-- Pilih Fasilitas --</option>
                                     @foreach($facilities as $fac)
-                                        <option value="{{ $fac['id'] }}" {{ old('facility_id', request('facility_id')) == $fac['id'] ? 'selected' : '' }}>
+                                        <option value="{{ $fac['id'] }}" 
+                                            x-show="!selectedCategory || selectedCategory === '{{ strtolower($fac['kategori']) }}'"
+                                            {{ old('facility_id', request('facility_id')) == $fac['id'] ? 'selected' : '' }}>
                                             {{ $fac['nama_fasilitas'] }} &mdash; [{{ strtoupper($fac['kategori']) }}]
                                         </option>
                                     @endforeach
@@ -334,7 +399,7 @@
                                 <label for="nomor_pc" class="block text-xs font-bold text-slate-700 uppercase mb-1.5">
                                     Nomor PC / Posisi Meja <span class="text-slate-400 font-normal normal-case">(Opsional / Sesuai Stiker Unit)</span>
                                 </label>
-                                <input type="text" id="nomor_pc" name="nomor_pc" value="{{ old('nomor_pc', request('pc')) }}" placeholder="Contoh: PC-04, Meja Baris 3 Sebelah Kiri, atau Switch Rack Utama" class="w-full py-2.5 px-3.5 rounded-xl border border-slate-300 text-sm focus:border-indigo-600 transition" />
+                                <input type="text" id="nomor_pc" name="nomor_pc" value="{{ old('nomor_pc', request('pc')) }}" placeholder="Contoh: PC-04, Meja Baris 3 Sebelah Kiri, atau Switch Rack Utama" class="w-full py-2.5 px-3.5 rounded-xl border border-slate-300 text-sm focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 transition" />
                             </div>
                         </div>
                     </div>
@@ -354,9 +419,9 @@
                                 <label for="deskripsi_masalah" class="block text-xs font-bold text-slate-700 uppercase">
                                     Deskripsi Masalah <span class="text-rose-500">*</span>
                                 </label>
-                                <span class="text-[11px] text-slate-400 font-mono" x-text="charCount + ' karakter'">0 karakter</span>
+                                <span class="text-[11px] font-mono font-semibold" :class="charCount > 1800 ? 'text-amber-600' : 'text-slate-400'" x-text="charCount + ' / 2000 karakter'">0 / 2000 karakter</span>
                             </div>
-                            <textarea id="deskripsi_masalah" name="deskripsi_masalah" rows="4" required x-on:input="charCount = $el.value.length" placeholder="Jelaskan secara rinci kendala yang dialami (misal: layar bergaris, kabel LAN longgar, tombol power macet, OS error saat boot)..." class="w-full py-2.5 px-3.5 rounded-xl border border-slate-300 text-sm focus:border-indigo-600 leading-relaxed transition">{{ old('deskripsi_masalah') }}</textarea>
+                            <textarea id="deskripsi_masalah" name="deskripsi_masalah" rows="4" required maxlength="2000" x-on:input="charCount = $el.value.length" placeholder="Jelaskan secara rinci kendala yang dialami (misal: layar bergaris, kabel LAN longgar, tombol power macet, OS error saat boot)..." class="w-full py-2.5 px-3.5 rounded-xl border border-slate-300 text-sm focus:border-indigo-600 focus:ring-4 focus:ring-indigo-100 leading-relaxed transition">{{ old('deskripsi_masalah') }}</textarea>
                             @error('deskripsi_masalah')
                                 <p class="text-xs text-rose-600 mt-1 font-medium">{{ $message }}</p>
                             @enderror
@@ -369,25 +434,25 @@
                             </label>
 
                             <!-- Area Dropzone / Input -->
-                            <div class="border-2 border-dashed border-slate-300 hover:border-indigo-500 rounded-2xl p-6 text-center cursor-pointer transition bg-slate-50/50 hover:bg-indigo-50/20" x-on:click="$refs.fileInput.click()" x-show="!filePreviewUrl">
+                            <div class="border-2 border-dashed border-slate-300 hover:border-indigo-500 rounded-2xl p-6 text-center cursor-pointer transition-all bg-slate-50/50 hover:bg-indigo-50/20 group" x-on:click="$refs.fileInput.click()" x-show="!filePreviewUrl">
                                 <input type="file" id="foto_bukti" name="foto_bukti" accept="image/jpeg,image/png,image/jpg" class="hidden" x-ref="fileInput" x-on:change="handleFileSelect($event)" />
                                 
-                                <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center mx-auto mb-3">
+                                <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform shadow-xs">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                     </svg>
                                 </div>
-                                <div class="text-sm font-semibold text-slate-700">
-                                    Klik untuk memilih foto kerusakan
+                                <div class="text-sm font-bold text-slate-800">
+                                    Klik untuk memilih foto bukti kerusakan
                                 </div>
                                 <p class="text-xs text-slate-400 mt-1">Mendukung format PNG, JPG, atau JPEG hingga 5MB</p>
                             </div>
 
                             <!-- Live Preview Area jika file dipilih -->
-                            <div x-show="filePreviewUrl" x-cloak class="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between gap-4">
+                            <div x-show="filePreviewUrl" x-cloak class="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between gap-4 animate-fade-in shadow-xs">
                                 <div class="flex items-center gap-3 overflow-hidden">
                                     <template x-if="filePreviewUrl">
-                                        <img :src="filePreviewUrl" class="w-16 h-16 object-cover rounded-xl border border-slate-200 shrink-0" />
+                                        <img :src="filePreviewUrl" class="w-16 h-16 object-cover rounded-xl border border-slate-200 shrink-0 shadow-xs" />
                                     </template>
                                     <div class="min-w-0">
                                         <p class="text-sm font-bold text-slate-800 truncate" x-text="fileName"></p>
@@ -421,11 +486,19 @@
                             Setelah dikirim, Anda akan langsung menerima <strong>Kode Tiket</strong> untuk melacak proses perbaikan.
                         </div>
 
-                        <button type="submit" class="w-full sm:w-auto px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold rounded-2xl shadow-lg shadow-indigo-600/25 transition-all hover:scale-[1.02] flex items-center justify-center gap-2 text-sm">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                            </svg>
-                            <span>Kirim Laporan Kerusakan</span>
+                        <button type="submit" :disabled="isSubmitting" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 active:scale-95 text-white font-bold rounded-2xl shadow-lg shadow-indigo-600/25 transition-all flex items-center justify-center gap-2 text-sm disabled:opacity-60 cursor-pointer">
+                            <span x-show="!isSubmitting" class="flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                </svg>
+                                <span>Kirim Laporan Kerusakan</span>
+                            </span>
+                            <span x-show="isSubmitting" x-cloak class="flex items-center gap-2">
+                                <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                                <span>Mengirim Laporan...</span>
+                            </span>
                         </button>
                     </div>
                 </form>

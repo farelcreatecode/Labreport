@@ -318,7 +318,10 @@
             @endif
 
             <!-- Daftar Hasil Penanganan Laporan Terkini (Menu Hasil Laporan Publik) -->
-            <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-200/80 p-6 sm:p-8 space-y-6">
+            <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-200/80 p-6 sm:p-8 space-y-6" x-data="{
+                activeFilter: 'all',
+                filterKeyword: ''
+            }">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
                         <div class="flex items-center gap-2">
@@ -329,6 +332,41 @@
                     </div>
                     <div class="text-[11px] text-slate-400 italic">
                         *Identitas pelapor disamarkan demi privasi
+                    </div>
+                </div>
+
+                <!-- Filter Kategori Tabs & Search Mini -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1 border-t border-slate-100">
+                    <div class="flex flex-wrap items-center gap-1.5">
+                        <button type="button" @click="activeFilter = 'all'"
+                            :class="activeFilter === 'all' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+                            class="px-3 py-1.5 rounded-xl text-xs font-bold transition">
+                            Semua
+                        </button>
+                        <button type="button" @click="activeFilter = 'software'"
+                            :class="activeFilter === 'software' ? 'bg-purple-600 text-white shadow-md shadow-purple-600/20' : 'bg-purple-50 text-purple-700 hover:bg-purple-100'"
+                            class="px-3 py-1.5 rounded-xl text-xs font-bold transition">
+                            Software
+                        </button>
+                        <button type="button" @click="activeFilter = 'hardware'"
+                            :class="activeFilter === 'hardware' ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20' : 'bg-blue-50 text-blue-700 hover:bg-blue-100'"
+                            class="px-3 py-1.5 rounded-xl text-xs font-bold transition">
+                            Hardware
+                        </button>
+                        <button type="button" @click="activeFilter = 'jaringan'"
+                            :class="activeFilter === 'jaringan' ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'"
+                            class="px-3 py-1.5 rounded-xl text-xs font-bold transition">
+                            Jaringan
+                        </button>
+                    </div>
+
+                    <div class="relative sm:w-64">
+                        <input type="text" x-model="filterKeyword" placeholder="Saring tiket/lab..." class="w-full py-1.5 pl-8 pr-3 rounded-xl border border-slate-200 text-xs focus:border-indigo-600 bg-slate-50 focus:bg-white transition" />
+                        <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
                     </div>
                 </div>
 
@@ -350,8 +388,11 @@
                                     'jaringan' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
                                     default    => 'bg-slate-50 text-slate-700 border-slate-200',
                                 };
+                                $searchString = strtolower($item['kode_laporan'] . ' ' . $item['fasilitas'] . ' ' . $item['laboratorium'] . ' ' . ($item['nomor_pc'] ?? '') . ' ' . $item['deskripsi_masalah']);
                             @endphp
-                            <div class="p-4 rounded-2xl border border-slate-100 bg-slate-50/60 hover:bg-white hover:border-indigo-100 hover:shadow-md transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div x-show="(activeFilter === 'all' || activeFilter === '{{ strtolower($item['kategori']) }}') && (!filterKeyword || '{{ $searchString }}'.includes(filterKeyword.toLowerCase()))"
+                                x-transition
+                                class="p-4 rounded-2xl border border-slate-100 bg-slate-50/60 hover:bg-white hover:border-indigo-100 hover:shadow-md transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div class="space-y-1.5 flex-1">
                                     <div class="flex flex-wrap items-center gap-2">
                                         <span class="font-mono text-xs font-bold text-indigo-700">{{ $item['kode_laporan'] }}</span>
