@@ -321,6 +321,8 @@
                         </div>
                     <?php endif; ?>
                 </div>
+            <?php endif; ?>
+
             <!-- Daftar Hasil Penanganan Laporan Terkini (Menu Hasil Laporan Publik) -->
             <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-200/80 p-6 sm:p-8 space-y-6">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">

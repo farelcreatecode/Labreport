@@ -30,6 +30,28 @@ class AdminReportController extends Controller
         $softwareCount = Report::whereHas('facility', fn ($q) => $q->where('kategori', 'software'))->count();
         $jaringanCount = Report::whereHas('facility', fn ($q) => $q->where('kategori', 'jaringan'))->count();
 
+        // Rincian status (menunggu/pending, diproses, selesai) per kategori
+        $categoryDetails = [
+            'software' => [
+                'total'    => $softwareCount,
+                'pending'  => Report::whereHas('facility', fn ($q) => $q->where('kategori', 'software'))->where('status', 'pending')->count(),
+                'diproses' => Report::whereHas('facility', fn ($q) => $q->where('kategori', 'software'))->where('status', 'diproses')->count(),
+                'selesai'  => Report::whereHas('facility', fn ($q) => $q->where('kategori', 'software'))->where('status', 'selesai')->count(),
+            ],
+            'hardware' => [
+                'total'    => $hardwareCount,
+                'pending'  => Report::whereHas('facility', fn ($q) => $q->where('kategori', 'hardware'))->where('status', 'pending')->count(),
+                'diproses' => Report::whereHas('facility', fn ($q) => $q->where('kategori', 'hardware'))->where('status', 'diproses')->count(),
+                'selesai'  => Report::whereHas('facility', fn ($q) => $q->where('kategori', 'hardware'))->where('status', 'selesai')->count(),
+            ],
+            'jaringan' => [
+                'total'    => $jaringanCount,
+                'pending'  => Report::whereHas('facility', fn ($q) => $q->where('kategori', 'jaringan'))->where('status', 'pending')->count(),
+                'diproses' => Report::whereHas('facility', fn ($q) => $q->where('kategori', 'jaringan'))->where('status', 'diproses')->count(),
+                'selesai'  => Report::whereHas('facility', fn ($q) => $q->where('kategori', 'jaringan'))->where('status', 'selesai')->count(),
+            ],
+        ];
+
         // 5 Laporan terbaru
         $latestReports = Report::with(['laboratory', 'facility', 'technician'])
             ->latest()
@@ -51,7 +73,8 @@ class AdminReportController extends Controller
                     'software' => $softwareCount,
                     'jaringan' => $jaringanCount,
                 ],
-                'latest_reports' => $latestReports,
+                'category_details' => $categoryDetails,
+                'latest_reports'   => $latestReports,
             ],
         ]);
     }
