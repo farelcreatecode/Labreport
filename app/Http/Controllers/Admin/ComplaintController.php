@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateComplaintStatusRequest;
 use App\Models\Category;
 use App\Models\Complaint;
+use App\Models\ComplaintHistory;
 use App\Models\Lab;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
@@ -84,7 +86,7 @@ class ComplaintController extends Controller
      */
     public function show(Complaint $complaint): View
     {
-        $complaint->load(['user', 'lab', 'category', 'technician']);
+        $complaint->load(['user', 'lab', 'category', 'technician', 'histories.user']);
 
         $technicians = User::where('role', 'teknisi')->orderBy('name')->get();
 
@@ -93,6 +95,8 @@ class ComplaintController extends Controller
 
     /**
      * Update complaint status, assign technician, and provide feedback.
+     * Wrapped in DB::transaction() for data integrity.
+     * Records audit trail in complaint_histories table.
      */
     public function update(UpdateComplaintStatusRequest $request, Complaint $complaint): RedirectResponse
     {
@@ -108,7 +112,24 @@ class ComplaintController extends Controller
             unset($validated['technician_id']);
         }
 
-        $complaint->update($validated);
+        // Simpan status lama sebelum update
+        $oldStatus = $complaint->status;
+
+        DB::transaction(function () use ($complaint, $validated, $user, $oldStatus) {
+            $complaint->update($validated);
+
+            // Catat audit trail jika status berubah
+            if ($oldStatus !== $complaint->status) {
+                ComplaintHistory::create([
+                    'complaint_id' => $complaint->id,
+                    'user_id'      => $user->id,
+                    'status_from'  => $oldStatus,
+                    'status_to'    => $complaint->status,
+                    'catatan'      => $validated['tanggapan'] ?? null,
+                    'created_at'   => now(),
+                ]);
+            }
+        });
 
         return redirect()->route('admin.complaints.show', $complaint)
             ->with('success', 'Status laporan ' . $complaint->report_number . ' berhasil diperbarui.');

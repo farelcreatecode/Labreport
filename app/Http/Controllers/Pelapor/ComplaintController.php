@@ -6,10 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreComplaintRequest;
 use App\Models\Category;
 use App\Models\Complaint;
+use App\Models\ComplaintHistory;
 use App\Models\Lab;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ComplaintController extends Controller
@@ -63,20 +66,45 @@ class ComplaintController extends Controller
 
     /**
      * Store a newly created complaint in storage.
+     * Wrapped in DB::transaction() — if DB fails, uploaded file is cleaned up.
      */
     public function store(StoreComplaintRequest $request): RedirectResponse
     {
         $validated = $request->validated();
 
-        // Handle file upload
+        // Handle file upload sebelum transaction
+        $uploadedPath = null;
         if ($request->hasFile('foto_bukti')) {
-            $validated['foto_bukti'] = $request->file('foto_bukti')->store('complaints', 'public');
+            $uploadedPath = $request->file('foto_bukti')->store('complaints', 'public');
+            $validated['foto_bukti'] = $uploadedPath;
         }
 
         $validated['user_id'] = $request->user()->id;
         $validated['status'] = 'pending';
 
-        $complaint = Complaint::create($validated);
+        try {
+            $complaint = DB::transaction(function () use ($validated, $request) {
+                $complaint = Complaint::create($validated);
+
+                // Catat audit trail: laporan baru dibuat
+                ComplaintHistory::create([
+                    'complaint_id' => $complaint->id,
+                    'user_id'      => $request->user()->id,
+                    'status_from'  => null,
+                    'status_to'    => 'pending',
+                    'catatan'      => 'Laporan baru dibuat oleh pelapor.',
+                    'created_at'   => now(),
+                ]);
+
+                return $complaint;
+            });
+        } catch (\Throwable $e) {
+            // Jika DB gagal, hapus file yang sudah ter-upload
+            if ($uploadedPath) {
+                Storage::disk('public')->delete($uploadedPath);
+            }
+            throw $e;
+        }
 
         return redirect()->route('complaints.show', $complaint)
             ->with('success', 'Laporan kerusakan fasilitas berhasil dikirim dengan nomor ' . $complaint->report_number . '.');

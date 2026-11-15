@@ -1,0 +1,203 @@
+{
+	"info": {
+		"_postman_id": "labreport-microservices-v1",
+		"name": "LabReport - Microservices Architecture API",
+		"description": "Koleksi API untuk arsitektur Microservices LabReport melalui API Gateway (Port 8001)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Public (Pelapor Tanpa Login)",
+			"item": [
+				{
+					"name": "Ambil Data Master Form Pelapor",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8001/api/public/form-data",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8001",
+							"path": ["api", "public", "form-data"]
+						}
+					}
+				},
+				{
+					"name": "Kirim Laporan Kerusakan Baru",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{"key": "nama_pelapor", "value": "Ahmad Fauzi", "type": "text"},
+								{"key": "kontak_pelapor", "value": "081234567890", "type": "text"},
+								{"key": "laboratory_id", "value": "1", "type": "text"},
+								{"key": "facility_id", "value": "1", "type": "text"},
+								{"key": "nomor_pc", "value": "PC-05", "type": "text"},
+								{"key": "deskripsi_masalah", "value": "Layar monitor berkedip dan PC mati sendiri.", "type": "text"},
+								{"key": "foto_bukti", "type": "file", "src": []}
+							]
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8001/api/public/reports",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8001",
+							"path": ["api", "public", "reports"]
+						}
+					}
+				},
+				{
+					"name": "Lacak Status Laporan (By Kode)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8001/api/public/reports/#LR-202611-0001",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8001",
+							"path": ["api", "public", "reports", "#LR-202611-0001"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Auth Service (Admin)",
+			"item": [
+				{
+					"name": "Admin Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@labreport.com\",\n    \"password\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8001/api/auth/login",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8001",
+							"path": ["api", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Verifikasi Token Admin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"YOUR_BEARER_TOKEN_HERE\"\n}"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8001/api/auth/verify-token",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8001",
+							"path": ["api", "auth", "verify-token"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Admin Area (Protected with Bearer Token)",
+			"item": [
+				{
+					"name": "Admin Dashboard Summary",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer YOUR_BEARER_TOKEN_HERE"}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8001/api/admin/dashboard",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8001",
+							"path": ["api", "admin", "dashboard"]
+						}
+					}
+				},
+				{
+					"name": "Daftar Laporan (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer YOUR_BEARER_TOKEN_HERE"}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8001/api/admin/reports?status=pending",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8001",
+							"path": ["api", "admin", "reports"],
+							"query": [
+								{"key": "status", "value": "pending"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Status & Penugasan Teknisi",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Content-Type", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer YOUR_BEARER_TOKEN_HERE"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"diproses\",\n    \"technician_id\": 1,\n    \"tanggapan\": \"Teknisi Ahmad Fadli ditugaskan memeriksa perangkat PC-05.\"\n}"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8001/api/admin/reports/1/status",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8001",
+							"path": ["api", "admin", "reports", "1", "status"]
+						}
+					}
+				},
+				{
+					"name": "Daftar Teknisi Lapangan",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer YOUR_BEARER_TOKEN_HERE"}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8001/api/admin/technicians",
+							"protocol": "http",
+							"host": ["127", "0", "0", "1"],
+							"port": "8001",
+							"path": ["api", "admin", "technicians"]
+						}
+					}
+				}
+			]
+		}
+	]
+}

@@ -20,7 +20,7 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Detail Info Laporan (2 Kolom) -->
-                <div class="lg:col-span-2 bg-white rounded-lg shadow-sm p-6 sm:p-8 space-y-6">
+                <div class="lg:col-span-2 space-y-6">
                     <div class="flex items-center justify-between pb-4 border-b border-gray-200">
                         <div>
                             <span class="text-xs font-semibold text-gray-400 uppercase">Status Terkini</span>
