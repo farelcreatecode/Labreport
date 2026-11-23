@@ -1,110 +1,75 @@
-# LabReport &mdash; Arsitektur Microservices Sistem Pelaporan Fasilitas Lab
+# Sistem Informasi Pelaporan Fasilitas Laboratorium Komputer (LabReport)
+## Arsitektur Microservices Laravel
 
-Website Sistem Informasi Pelaporan Fasilitas Laboratorium Komputer berbasis **Microservices Architecture** menggunakan Laravel 12 dan MySQL.
-
----
-
-## 🏛️ Struktur Arsitektur Sistem
-
-Sistem ini dipecah menjadi **4 aplikasi mandiri**:
-
-```
-pelaporan-lab/
-├── frontend/        -> Portal Web Pelapor & Dashboard Admin (Port: 8000)
-├── api-gateway/     -> Router Tunggal & Reverse Proxy (Port: 8001)
-├── auth-service/    -> Microservice Autentikasi Admin (Port: 8002, DB: db_auth)
-├── report-service/  -> Microservice Laporan, Fasilitas & Teknisi (Port: 8003, DB: db_report)
-├── docs/            -> Postman Collection & Dokumentasi API
-├── tests/           -> End-to-End Test Script
-├── start-microservices.bat -> Script Otomatis Menjalankan Seluruh Service
-└── stop-microservices.bat  -> Script Menghentikan Seluruh Service
-```
+Project ini adalah implementasi sistem pelaporan fasilitas laboratorium komputer berbasis **Microservices Architecture** menggunakan framework Laravel, terbagi menjadi beberapa layanan independen dengan basis data terisolasi dan portal antarmuka terpisah (*Separated Frontends / Micro-Frontends*).
 
 ---
 
-## 👥 Pengguna & Hak Akses
+## 📁 Struktur Direktori Project
 
-1. **Pelapor (Publik / Tanpa Login):**
-   - Mengisi form pelaporan langsung di `http://127.0.0.1:8000/`.
-   - Mengisi nama, kontak (WhatsApp/Email), memilih laboratorium, fasilitas, nomor PC, deskripsi kerusakan, dan upload foto bukti.
-   - Mendapatkan **Kode Laporan** (contoh: `#LR-202611-0001`) dan dapat melacak status perbaikan secara langsung di menu *Lacak Status Tiket*.
-
-2. **Admin (Wajib Login):**
-   - Login di `http://127.0.0.1:8000/login`.
-   - Memantau dashboard statistik (Software, Hardware, Jaringan) dan status laporan.
-   - Menugaskan teknisi lapangan ke setiap laporan.
-   - Memperbarui status laporan (`pending` &rarr; `diproses` &rarr; `selesai` / `ditolak`).
-   - Melihat visualisasi timeline riwayat penanganan laporan.
-   - Mengelola master data Laboratorium, Fasilitas, dan Teknisi Lapangan.
-
-3. **Teknisi (Bukan User Login, Pekerja Lapangan):**
-   - Tidak memiliki akun login sistem.
-   - Data teknisi disimpan di database `db_report` (tabel `technicians`) dan dipilih oleh Admin via dropdown penugasan.
-
----
-
-## 💾 Ketentuan Database (MySQL)
-
-Sistem menggunakan **2 Database terpisah**:
-- **`db_auth`** (Auth Service):
-  - `users` (Akun Administrator)
-  - `personal_access_tokens` (Sanctum Bearer Token)
-- **`db_report`** (Report Service):
-  - `laboratories` (Data Lab)
-  - `facilities` (Data Fasilitas & Unit PC)
-  - `technicians` (Data Teknisi Lapangan)
-  - `reports` (Data Laporan Kerusakan)
-  - `report_attachments` (Foto Bukti Kerusakan)
-  - `report_histories` (Audit Trail Riwayat Penanganan)
-
----
-
-## 🚀 Cara Menjalankan Sistem
-
-### Cara 1: Menggunakan Script Otomatis (Sangat Mudah)
-Cukup double-click file:
-`c:\laragon\www\Backend Micro\pelaporan-lab\start-microservices.bat`
-Script ini akan langsung membuka 4 server secara bersamaan.
-
-### Cara 2: Manual via Terminal (4 Terminal Berbeda)
-
-```bash
-# Terminal 1: Auth Service (Port 8002)
-cd pelaporan-lab/auth-service
-php artisan serve --port=8002
-
-# Terminal 2: Report Service (Port 8003)
-cd pelaporan-lab/report-service
-php artisan serve --port=8003
-
-# Terminal 3: API Gateway (Port 8001)
-cd pelaporan-lab/api-gateway
-php artisan serve --port=8001
-
-# Terminal 4: Frontend Portal (Port 8000)
-cd pelaporan-lab/frontend
-php artisan serve --port=8000
+```text
+Backend Micro/
+├── pelaporan-lab/               # ARSITEKTUR UTAMA MICROSERVICES
+│   ├── frontend-pelapor/        # Port 8000 (Portal Publik: Form & Pelacakan Tiket Mahasiswa)
+│   ├── frontend-admin/          # Port 8004 (Portal Backoffice: Login & Dashboard Admin Lab)
+│   ├── api-gateway/             # Port 8001 (Reverse Proxy & Routing Terpusat)
+│   ├── auth-service/            # Port 8002 (Autentikasi Admin, DB: db_auth)
+│   ├── report-service/          # Port 8003 (Proses Bisnis Laporan, DB: db_report)
+│   ├── docs/                    # Koleksi Postman API & Panduan Teknis
+│   ├── tests/                   # Skrip Pengujian Otomatis End-to-End
+│   ├── start-microservices.bat  # Script Peluncur 5 Layanan Sekaligus
+│   └── stop-microservices.bat   # Script Penghenti Semua Layanan
+│
+├── arsip-monolith/              # CADANGAN ARSIP MONOLITH LAMA (Diisolasi)
+│   ├── app/
+│   ├── database/
+│   ├── resources/
+│   ├── routes/
+│   └── .env                     # Konfigurasi Monolith Lama (db_pengaduan_lab)
+│
+├── start-microservices.bat      # Shortcut Peluncur Layanan dari Root
+├── stop-microservices.bat       # Shortcut Penghenti Layanan dari Root
+└── README.md                    # Dokumentasi Proyek
 ```
 
 ---
 
-## 🔑 Kredensial Login Administrator
+## 🚀 Pembagian Layanan & Port
 
-- **URL Login:** `http://127.0.0.1:8000/login`
-- **Email:** `admin@labreport.com`
-- **Password:** `password`
+| Layanan | Direktori | Port | Database | Deskripsi |
+| :--- | :--- | :---: | :---: | :--- |
+| **Portal Pelapor (Publik)** | `pelaporan-lab/frontend-pelapor` | `8000` | *None* | Portal Publik khusus Mahasiswa/Pelapor tanpa login. Form pengaduan & lacak status. |
+| **Portal Admin (Backoffice)** | `pelaporan-lab/frontend-admin` | `8004` | *None* | Portal khusus Admin Lab. Wajib login kredensial & Bearer Token. |
+| **API Gateway** | `pelaporan-lab/api-gateway` | `8001` | *None* | Gerbang utama yang merutekan request dari kedua frontend ke microservice terkait. |
+| **Auth Service** | `pelaporan-lab/auth-service` | `8002` | `db_auth` | Layanan autentikasi admin, validasi akun, & penerbitan Bearer Token Sanctum. |
+| **Report Service** | `pelaporan-lab/report-service` | `8003` | `db_report` | Layanan pengaduan, upload foto bukti, QR Code fasilitas lab, & penugasan teknisi. |
 
 ---
 
-## 📬 Pengujian API Menggunakan Postman
+## ⚡ Cara Menjalankan Sistem
 
-File koleksi Postman siap pakai tersedia di:
-`pelaporan-lab/docs/LabReport_Microservices.postman_collection.json`
+1. Pastikan **MySQL di Laragon** sudah berjalan (Host: `127.0.0.1:3306`, User: `root`, Password kosong).
+2. Database yang digunakan:
+   - `db_auth` (untuk Auth Service)
+   - `db_report` (untuk Report Service)
+3. Cukup **double-click** file:
+   ```cmd
+   start-microservices.bat
+   ```
+   Seluruh 5 terminal layanan (`frontend-pelapor`, `frontend-admin`, `api-gateway`, `auth-service`, dan `report-service`) akan terbuka dan berjalan otomatis.
+4. Buka browser:
+   - **Portal Pelapor (Publik / Tanpa Login):** [http://127.0.0.1:8000/lapor](http://127.0.0.1:8000/lapor)
+   - **Hasil & Lacak Laporan Publik:** [http://127.0.0.1:8000/lacak](http://127.0.0.1:8000/lacak)
+   - **Portal Admin (Login & Dashboard):** [http://127.0.0.1:8004/login](http://127.0.0.1:8004/login)
+     - *Email:* `admin@labreport.com`
+     - *Password:* `password`
 
-Tinggal import file tersebut ke Postman untuk menguji endpoint:
-1. `GET /api/public/form-data`
-2. `POST /api/public/reports`
-3. `POST /api/auth/login`
-4. `GET /api/admin/dashboard`
-5. `PUT /api/admin/reports/{id}/status`
-6. `GET /api/admin/technicians`
+---
+
+## 🛑 Cara Menghentikan Sistem
+
+Cukup **double-click** file:
+```cmd
+stop-microservices.bat
+```
+Semua proses PHP server di port 8000, 8001, 8002, 8003, dan 8004 akan dihentikan secara bersih.

@@ -5,23 +5,37 @@ echo "   PEMERIKSAAN KONEKSI & INTEGRASI ARSITEKTUR MICROSERVICES\n";
 echo "====================================================================\n\n";
 
 $passCount = 0;
-$totalChecks = 6;
+$totalChecks = 7;
 
-// CHECK 1: Konfigurasi Frontend (Port 8000)
-echo "[1/6] Memeriksa Konfigurasi Frontend...\n";
-$feEnv = file_get_contents(__DIR__ . '/../frontend/.env');
-$hasNoDb = str_contains($feEnv, 'DB_CONNECTION=null');
-$hasGateway = str_contains($feEnv, 'API_GATEWAY_URL=http://127.0.0.1:8001/api');
-if ($hasNoDb && $hasGateway) {
-    echo "      -> Frontend terisolasi dari database (DB_CONNECTION=null) [PASS]\n";
-    echo "      -> Frontend terhubung ke API Gateway (Port 8001) [PASS]\n";
+// CHECK 1: Konfigurasi Frontend Pelapor (Port 8000)
+echo "[1/7] Memeriksa Konfigurasi Portal Pelapor (Port 8000)...\n";
+$fePelaporEnv = file_get_contents(__DIR__ . '/../frontend-pelapor/.env');
+$hasNoDbPelapor = str_contains($fePelaporEnv, 'DB_CONNECTION=null');
+$hasGatewayPelapor = str_contains($fePelaporEnv, 'API_GATEWAY_URL=http://127.0.0.1:8001/api');
+if ($hasNoDbPelapor && $hasGatewayPelapor) {
+    echo "      -> Portal Pelapor terisolasi dari database (DB_CONNECTION=null) [PASS]\n";
+    echo "      -> Portal Pelapor terhubung ke API Gateway (Port 8001) [PASS]\n";
     $passCount++;
 } else {
-    echo "      -> Konfigurasi Frontend tidak sesuai [FAIL]\n";
+    echo "      -> Konfigurasi Portal Pelapor tidak sesuai [FAIL]\n";
 }
 
-// CHECK 2: Konfigurasi API Gateway (Port 8001)
-echo "\n[2/6] Memeriksa Konfigurasi API Gateway...\n";
+// CHECK 2: Konfigurasi Frontend Admin (Port 8004)
+echo "\n[2/7] Memeriksa Konfigurasi Portal Admin (Port 8004)...\n";
+$feAdminEnv = file_get_contents(__DIR__ . '/../frontend-admin/.env');
+$hasNoDbAdmin = str_contains($feAdminEnv, 'DB_CONNECTION=null');
+$hasGatewayAdmin = str_contains($feAdminEnv, 'API_GATEWAY_URL=http://127.0.0.1:8001/api');
+$hasPort8004 = str_contains($feAdminEnv, 'APP_URL=http://127.0.0.1:8004');
+if ($hasNoDbAdmin && $hasGatewayAdmin && $hasPort8004) {
+    echo "      -> Portal Admin berjalan di Port 8004 (Terpisah dari Pelapor) [PASS]\n";
+    echo "      -> Portal Admin terhubung ke API Gateway (Port 8001) [PASS]\n";
+    $passCount++;
+} else {
+    echo "      -> Konfigurasi Portal Admin tidak sesuai [FAIL]\n";
+}
+
+// CHECK 3: Konfigurasi API Gateway (Port 8001)
+echo "\n[3/7] Memeriksa Konfigurasi API Gateway (Port 8001)...\n";
 $gwEnv = file_get_contents(__DIR__ . '/../api-gateway/.env');
 $hasAuthUrl = str_contains($gwEnv, 'AUTH_SERVICE_URL=http://127.0.0.1:8002');
 $hasReportUrl = str_contains($gwEnv, 'REPORT_SERVICE_URL=http://127.0.0.1:8003');
@@ -33,8 +47,8 @@ if ($hasAuthUrl && $hasReportUrl) {
     echo "      -> Konfigurasi Gateway tidak sesuai [FAIL]\n";
 }
 
-// CHECK 3: Konfigurasi & Database Auth Service (Port 8002)
-echo "\n[3/6] Memeriksa Auth Service & Database db_auth...\n";
+// CHECK 4: Konfigurasi & Database Auth Service (Port 8002)
+echo "\n[4/7] Memeriksa Auth Service & Database db_auth...\n";
 try {
     $pdoAuth = new PDO('mysql:host=127.0.0.1;dbname=db_auth', 'root', '');
     $adminUser = $pdoAuth->query("SELECT id, name, email, role FROM users WHERE role='admin' LIMIT 1")->fetch(PDO::FETCH_ASSOC);
@@ -48,8 +62,8 @@ try {
     echo "      -> Gagal koneksi db_auth: " . $e->getMessage() . " [FAIL]\n";
 }
 
-// CHECK 4: Konfigurasi & Database Report Service (Port 8003)
-echo "\n[4/6] Memeriksa Report Service & Database db_report...\n";
+// CHECK 5: Konfigurasi & Database Report Service (Port 8003)
+echo "\n[5/7] Memeriksa Report Service & Database db_report...\n";
 try {
     $pdoReport = new PDO('mysql:host=127.0.0.1;dbname=db_report', 'root', '');
     $labs = $pdoReport->query("SELECT count(*) FROM laboratories")->fetchColumn();
@@ -67,8 +81,8 @@ try {
     echo "      -> Gagal koneksi db_report: " . $e->getMessage() . " [FAIL]\n";
 }
 
-// CHECK 5: Integrasi Antarservice: Report Service -> Auth Service Token Verification
-echo "\n[5/6] Memeriksa Integrasi Autentikasi Antarservice (Token Verification)...\n";
+// CHECK 6: Integrasi Antarservice: Report Service -> Auth Service Token Verification
+echo "\n[6/7] Memeriksa Integrasi Autentikasi Antarservice (Token Verification)...\n";
 chdir(__DIR__ . '/../auth-service');
 require 'vendor/autoload.php';
 $authApp = require_once 'bootstrap/app.php';
@@ -91,16 +105,20 @@ if (($verifyData['valid'] ?? false) === true) {
     echo "      -> Verifikasi Token gagal [FAIL]\n";
 }
 
-// CHECK 6: Verifikasi Alur Publik Tanpa Login & Proteksi Privasi
-echo "\n[6/6] Memeriksa Fitur Laporan Publik & Masking Privasi Pelapor...\n";
-$sampleReport = $pdoReport->query("SELECT * FROM reports ORDER BY id DESC LIMIT 1")->fetch(PDO::FETCH_ASSOC);
-if ($sampleReport) {
-    echo "      -> Kode Laporan Publik : {$sampleReport['kode_laporan']} [PASS]\n";
-    echo "      -> Status Laporan      : {$sampleReport['status']} [PASS]\n";
-    echo "      -> Pelapor tanpa akun  : Tanpa user_id (Murni publik) [PASS]\n";
+// CHECK 7: Verifikasi Pemisahan Route & Proteksi Privasi Pelapor
+echo "\n[7/7] Memeriksa Pemisahan Portal & Privasi Pelapor...\n";
+$fePelaporWeb = file_get_contents(__DIR__ . '/../frontend-pelapor/routes/web.php');
+$feAdminWeb = file_get_contents(__DIR__ . '/../frontend-admin/routes/web.php');
+
+$pelaporIsIsolated = !str_contains($fePelaporWeb, 'AdminAuthController') && str_contains($fePelaporWeb, 'PelaporController');
+$adminIsIsolated = !str_contains($feAdminWeb, 'PelaporController') && str_contains($feAdminWeb, 'AdminAuthController');
+
+if ($pelaporIsIsolated && $adminIsIsolated) {
+    echo "      -> Portal Pelapor (8000) 100% bebas dari route admin [PASS]\n";
+    echo "      -> Portal Admin (8004) 100% bebas dari route pelapor [PASS]\n";
     $passCount++;
 } else {
-    echo "      -> Belum ada laporan tersimpan [FAIL]\n";
+    echo "      -> Isolasi route antar portal gagal [FAIL]\n";
 }
 
 echo "\n====================================================================\n";
