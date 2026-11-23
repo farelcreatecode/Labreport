@@ -34,3 +34,9 @@ pelaporan-lab/*/node_modules/
 pelaporan-lab/*/.env
 pelaporan-lab/*/storage/*.key
 pelaporan-lab/*/public/storage
+pelaporan-lab/*/storage/framework/sessions/*
+!pelaporan-lab/*/storage/framework/sessions/.gitignore
+pelaporan-lab/*/storage/framework/views/*
+!pelaporan-lab/*/storage/framework/views/.gitignore
+pelaporan-lab/*/storage/framework/cache/*
+!pelaporan-lab/*/storage/framework/cache/.gitignore

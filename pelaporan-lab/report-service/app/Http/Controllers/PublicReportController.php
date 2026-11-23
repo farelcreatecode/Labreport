@@ -117,6 +117,22 @@ class PublicReportController extends Controller
                 return $report;
             });
 
+            // Dispatch notifikasi laporan baru ke Notification Service (Microservice Port 8005)
+            try {
+                $report->loadMissing(['laboratory', 'facility']);
+                $notifUrl = rtrim(env('NOTIFICATION_SERVICE_URL', 'http://127.0.0.1:8005/api'), '/') . '/notifications/report-created';
+                \Illuminate\Support\Facades\Http::timeout(3)->post($notifUrl, [
+                    'kode_laporan'   => $report->kode_laporan,
+                    'nama_pelapor'   => $report->nama_pelapor,
+                    'kontak_pelapor' => $report->kontak_pelapor,
+                    'laboratorium'   => $report->laboratory->nama_lab ?? 'Laboratorium',
+                    'fasilitas'      => $report->facility->nama_fasilitas ?? 'Fasilitas Lab',
+                    'deskripsi'      => $report->deskripsi_masalah,
+                ]);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Dispatch notification failed: ' . $e->getMessage());
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Laporan kerusakan fasilitas berhasil dikirim.',

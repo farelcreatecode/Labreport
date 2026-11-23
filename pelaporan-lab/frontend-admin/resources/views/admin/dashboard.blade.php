@@ -312,6 +312,74 @@
                 </div>
             </div>
 
+            <!-- CARD LOG NOTIFIKASI OTOMATIS (Notification Service Port 8005) -->
+            <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
+                <div class="p-6 pb-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h3 class="text-base font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-beacon"></span>
+                            <span>Aktivitas Notification Service (Port 8005)</span>
+                        </h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Notifikasi otomatis ke Mahasiswa saat status berubah, Teknisi saat ada tugas baru, & Admin saat laporan masuk</p>
+                    </div>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 self-start sm:self-auto">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        Service Terhubung (Port 8005)
+                    </span>
+                </div>
+
+                <div class="divide-y divide-slate-100">
+                    @forelse($notificationLogs as $log)
+                        @php
+                            $ch = $log['channel'] ?? 'whatsapp';
+                            $channelBadge = match($ch) {
+                                'whatsapp' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                                'email'    => 'bg-blue-50 text-blue-700 border-blue-200',
+                                default    => 'bg-indigo-50 text-indigo-700 border-indigo-200',
+                            };
+                            $roleLabel = match($log['recipient_role'] ?? '') {
+                                'admin'      => 'Admin Lab',
+                                'technician' => 'Teknisi Lapangan',
+                                default      => 'Mahasiswa / Pelapor',
+                            };
+                        @endphp
+                        <div class="p-5 hover:bg-slate-50/70 transition flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div class="space-y-1 max-w-3xl">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider border {{ $channelBadge }}">
+                                        {{ strtoupper($ch) }}
+                                    </span>
+                                    <span class="text-xs font-bold text-slate-800">
+                                        {{ $log['title'] }}
+                                    </span>
+                                    <span class="text-[11px] text-slate-400 font-medium">
+                                        &bull; Kepada: <strong class="text-slate-700">{{ $log['recipient_name'] }}</strong> ({{ $roleLabel }})
+                                    </span>
+                                </div>
+                                <p class="text-xs text-slate-600 leading-relaxed font-sans bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                                    "{{ $log['message'] }}"
+                                </p>
+                            </div>
+                            <div class="shrink-0 text-right">
+                                <div class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    <span>Terkirim (Delivered)</span>
+                                </div>
+                                <div class="text-[10px] text-slate-400 mt-0.5 font-mono">
+                                    {{ isset($log['created_at']) ? \Carbon\Carbon::parse($log['created_at'])->diffForHumans() : 'Baru saja' }}
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="p-8 text-center text-slate-400 italic text-xs">
+                            Belum ada notifikasi yang terkirim. Notifikasi akan otomatis tercatat ketika laporan baru dikirim atau status diperbarui.
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+
         </div>
     </div>
 </x-app-layout>

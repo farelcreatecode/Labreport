@@ -10,8 +10,9 @@ Route::get('/health', function () {
         'status'  => 'healthy',
         'port'    => 8001,
         'routes'  => [
-            'auth'   => env('AUTH_SERVICE_URL', 'http://127.0.0.1:8002'),
-            'report' => env('REPORT_SERVICE_URL', 'http://127.0.0.1:8003'),
+            'auth'         => env('AUTH_SERVICE_URL', 'http://127.0.0.1:8002'),
+            'report'       => env('REPORT_SERVICE_URL', 'http://127.0.0.1:8003'),
+            'notification' => env('NOTIFICATION_SERVICE_URL', 'http://127.0.0.1:8005'),
         ],
         'timestamp' => now()->toIso8601String(),
     ]);
@@ -29,4 +30,9 @@ Route::any('/public/{any?}', function (Illuminate\Http\Request $request, $any = 
 
 Route::any('/admin/{any?}', function (Illuminate\Http\Request $request, $any = '') {
     return app(GatewayController::class)->forwardReport($request, 'admin/' . $any);
+})->where('any', '.*');
+
+// Proxy ke Notification Service
+Route::any('/notifications/{any?}', function (Illuminate\Http\Request $request, $any = '') {
+    return app(GatewayController::class)->forwardNotification($request, 'notifications/' . $any);
 })->where('any', '.*');

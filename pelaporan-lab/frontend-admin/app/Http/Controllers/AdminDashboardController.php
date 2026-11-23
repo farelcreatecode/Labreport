@@ -23,6 +23,10 @@ class AdminDashboardController extends Controller
             'latest_reports' => [],
         ];
 
-        return view('admin.dashboard', compact('dashboardData'));
+        // Ambil riwayat log notifikasi dari Notification Service (Port 8005 via Gateway)
+        $notifResponse = $this->gateway->get('/notifications/logs?limit=6');
+        $notificationLogs = $notifResponse->json('data') ?? [];
+
+        return view('admin.dashboard', compact('dashboardData', 'notificationLogs'));
     }
 }

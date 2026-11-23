@@ -225,6 +225,38 @@ class AdminReportController extends Controller
 
         $report->load(['laboratory', 'facility', 'technician', 'attachments', 'histories']);
 
+        // Dispatch notifikasi ke Notification Service (Microservice Port 8005)
+        try {
+            $notifBase = rtrim(env('NOTIFICATION_SERVICE_URL', 'http://127.0.0.1:8005/api'), '/');
+
+            // 1. Jika ada penugasan teknisi baru
+            if ($oldTechId != $report->technician_id && $report->technician) {
+                \Illuminate\Support\Facades\Http::timeout(3)->post($notifBase . '/notifications/technician-assigned', [
+                    'kode_laporan'      => $report->kode_laporan,
+                    'technician_name'   => $report->technician->nama,
+                    'technician_kontak' => $report->technician->kontak ?? 'WhatsApp',
+                    'nama_pelapor'      => $report->nama_pelapor,
+                    'kontak_pelapor'    => $report->kontak_pelapor,
+                    'laboratorium'      => $report->laboratory->nama_lab ?? 'Laboratorium',
+                    'fasilitas'         => $report->facility->nama_fasilitas ?? 'Fasilitas Lab',
+                ]);
+            }
+
+            // 2. Jika status berubah
+            if ($oldStatus !== $report->status) {
+                \Illuminate\Support\Facades\Http::timeout(3)->post($notifBase . '/notifications/status-changed', [
+                    'kode_laporan'   => $report->kode_laporan,
+                    'nama_pelapor'   => $report->nama_pelapor,
+                    'kontak_pelapor' => $report->kontak_pelapor,
+                    'old_status'     => $oldStatus,
+                    'new_status'     => $report->status,
+                    'catatan'        => $request->tanggapan,
+                ]);
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Dispatch notification update failed: ' . $e->getMessage());
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Status laporan ' . $report->kode_laporan . ' berhasil diperbarui.',
